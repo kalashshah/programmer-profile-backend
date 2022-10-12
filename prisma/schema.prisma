@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  email              String   @unique
+  name               String
+  password           String
+  profilePicture     String?
+  description        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  favouritee         User     @relation(name: "favourite", fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  favourites         User[]   @relation("favourite")
+  userId             String
+  githubUsername     String?  @unique
+  leetcodeUsername   String?  @unique
+  codeforcesUsername String?  @unique
+}
