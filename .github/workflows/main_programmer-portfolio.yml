@@ -25,12 +25,15 @@ jobs:
         run: |
           npm install
           npm run build
+
+      - name: Zip files for faster upload
+        run: zip -symlinks -r nest.zip ./*
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: .
+          path: nest.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,11 +48,14 @@ jobs:
         with:
           name: node-app
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         id: deploy-to-webapp
         with:
           app-name: 'programmer-portfolio'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_24C640A18070442B80485A274214DB1D }}
-          package: .
+          package: nest.zip
+      
+      - name: Delete zip file
+        run: rm nest.zip
