@@ -16,10 +16,11 @@ model User {
   description        String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
-  favouritee         User     @relation(name: "favourite", fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  favourites         User[]   @relation("favourite")
-  userId             String
   githubUsername     String?  @unique
   leetcodeUsername   String?  @unique
   codeforcesUsername String?  @unique
+  following          User[]   @relation("FollowingUser", fields: [followingIds], references: [id])
+  followingIds       String[] @db.ObjectId
+  followedBy         User[]   @relation("FollowingUser", fields: [followedByIds], references: [id])
+  followedByIds      String[] @db.ObjectId
 }

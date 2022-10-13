@@ -1,0 +1,49 @@
+scalar DateTime
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  profilePicture: String
+  description: String
+  codeforcesUsername: String
+  githubUsername: String
+  leetcodeUsername: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  password: String!
+  favourites: [User!]!
+}
+
+# Signup
+input SignupInput {
+  name: String!
+  email: String!
+  password: String!
+  confirmPassword: String!
+}
+
+# Signin
+input SigninInput {
+  email: String!
+  password: String!
+}
+
+# Forgot Password
+input ForgotPasswordInput {
+  email: String!
+}
+
+# Reset Password
+input ResetPasswordInput {
+  password: String!
+  confirmPassword: String!
+}
+
+# Mutation for authentication
+type Mutation {
+  signup(input: SignupInput!): User!
+  signin(input: SigninInput!): User!
+  forgotPassword(input: ForgotPasswordInput!): Boolean!
+  resetPassword(input: ResetPasswordInput!): Boolean!
+}
