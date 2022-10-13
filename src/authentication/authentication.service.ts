@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { SigninInput } from './dto/signin.input';
-import { SignupInput } from './dto/signup.input';
+import { SigninInput, SignupInput } from '../../src/graphql.types';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';

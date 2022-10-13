@@ -1,6 +1,6 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { AuthenticationService } from './authentication.service';
-import { SignupInput } from './dto/signup.input';
+import { SigninInput, SignupInput } from '../../src/graphql.types';
 
 @Resolver('Authentication')
 export class AuthenticationResolver {
@@ -12,7 +12,7 @@ export class AuthenticationResolver {
   }
 
   @Mutation('signin')
-  async signin(@Args('data') data: SignupInput) {
+  async signin(@Args('data') data: SigninInput) {
     data.email.toLowerCase();
     return await this.authenticationService.signin(data);
   }
