@@ -1,5 +1,6 @@
 scalar DateTime
 
+# User type
 type User {
   id: ID!
   name: String!
@@ -12,7 +13,8 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime!
   password: String!
-  favourites: [User!]!
+  followedByIds: [ID!]!
+  followingIds: [ID!]!
 }
 
 # Signup
@@ -40,10 +42,25 @@ input ResetPasswordInput {
   confirmPassword: String!
 }
 
+type SigninOutput {
+  token: String!
+  user: User!
+}
+
+type SignupOutput {
+  token: String!
+  user: User!
+}
+
 # Mutation for authentication
 type Mutation {
-  signup(input: SignupInput!): User!
-  signin(input: SigninInput!): User!
+  signup(input: SignupInput!): SignupOutput!
+  signin(input: SigninInput!): SigninOutput!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   resetPassword(input: ResetPasswordInput!): Boolean!
+}
+
+# Query for authentication
+type Query {
+  allUsers: [User!]!
 }

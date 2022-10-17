@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SigninInput, SignupInput } from '../../src/graphql.types';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -12,6 +12,7 @@ export class AuthenticationService {
   constructor(private prisma: PrismaService) {}
 
   async signup(data: SignupInput) {
+    data.email = data.email.toLowerCase();
     if (data.password !== data.confirmPassword) {
       throw new BadRequestException(
         'Password and Confirm Password must be the same',
@@ -29,6 +30,8 @@ export class AuthenticationService {
         name: data.name,
         email: data.email,
         password: hashedPassword,
+        followedByIds: [],
+        followingIds: [],
       },
     });
     const token = jwt.sign({ user: user.id }, SECRET_KEY);
@@ -36,6 +39,7 @@ export class AuthenticationService {
   }
 
   async signin(data: SigninInput) {
+    data.email = data.email.toLowerCase();
     const user = await this.prisma.user.findUnique({
       where: { email: data.email },
     });

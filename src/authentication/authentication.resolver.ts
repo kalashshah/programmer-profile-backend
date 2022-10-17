@@ -7,13 +7,12 @@ export class AuthenticationResolver {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Mutation('signup')
-  async signup(@Args('data') data: SignupInput) {
-    return await this.authenticationService.signup(data);
+  async signup(@Args('input') input: SignupInput) {
+    return await this.authenticationService.signup(input);
   }
 
   @Mutation('signin')
-  async signin(@Args('data') data: SigninInput) {
-    data.email.toLowerCase();
-    return await this.authenticationService.signin(data);
+  async signin(@Args('input') input: SigninInput) {
+    return await this.authenticationService.signin(input);
   }
 }
