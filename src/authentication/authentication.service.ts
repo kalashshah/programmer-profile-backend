@@ -156,6 +156,9 @@ export class AuthenticationService {
     if (user === null) {
       throw new NotFoundException('User with the given email does not exist');
     }
+    await this.prisma.token.deleteMany({
+      where: { email: data.email },
+    });
     const code = this.createCode();
     await this.prisma.token.create({
       data: {
