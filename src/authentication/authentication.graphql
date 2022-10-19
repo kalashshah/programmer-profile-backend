@@ -46,6 +46,8 @@ input ForgotPasswordInput {
 
 # Reset Password
 input ResetPasswordInput {
+  email: String!
+  code: String!
   password: String!
   confirmPassword: String!
 }
@@ -67,10 +69,10 @@ type CheckCodeOutptut {
 
 # Mutation for authentication
 type Mutation {
-  signup(input: SignupInput!): Boolean!
+  signup(input: SignupInput!): String!
   signin(input: SigninInput!): SigninOutput!
-  forgotPassword(input: ForgotPasswordInput!): Boolean!
-  resetPassword(input: ResetPasswordInput!): Boolean!
+  forgotPassword(input: ForgotPasswordInput!): String!
+  resetPassword(input: ResetPasswordInput!): String!
   checkCode(input: CheckCodeInput!): CheckCodeOutptut!
 }
 

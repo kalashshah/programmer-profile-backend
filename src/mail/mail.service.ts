@@ -16,6 +16,21 @@ export class MailService {
       context: {
         name: user.name,
         code,
+        text: 'Your 6-digit Verification Code',
+      },
+    });
+  }
+
+  async sendPasswordReset(user: User, code: string) {
+    await this.mailerService.sendMail({
+      to: user.email,
+      from: `"No Reply" <${EMAIL}>`,
+      subject: 'Reset your password',
+      template: './email_confirmation',
+      context: {
+        name: user.name,
+        code,
+        text: 'Use this code to reset your password',
       },
     });
   }

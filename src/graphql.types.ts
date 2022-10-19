@@ -25,6 +25,8 @@ export class ForgotPasswordInput {
 }
 
 export class ResetPasswordInput {
+    email: string;
+    code: string;
     password: string;
     confirmPassword: string;
 }
@@ -69,13 +71,13 @@ export class CheckCodeOutptut {
 }
 
 export abstract class IMutation {
-    abstract signup(input: SignupInput): boolean | Promise<boolean>;
+    abstract signup(input: SignupInput): string | Promise<string>;
 
     abstract signin(input: SigninInput): SigninOutput | Promise<SigninOutput>;
 
-    abstract forgotPassword(input: ForgotPasswordInput): boolean | Promise<boolean>;
+    abstract forgotPassword(input: ForgotPasswordInput): string | Promise<string>;
 
-    abstract resetPassword(input: ResetPasswordInput): boolean | Promise<boolean>;
+    abstract resetPassword(input: ResetPasswordInput): string | Promise<string>;
 
     abstract checkCode(input: CheckCodeInput): CheckCodeOutptut | Promise<CheckCodeOutptut>;
 }
