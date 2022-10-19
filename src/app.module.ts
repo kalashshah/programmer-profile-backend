@@ -8,6 +8,7 @@ import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { MailModule } from './mail/mail.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProfileService } from './profile/profile.service';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ProfileService } from './profile/profile.service';
     ConfigModule.forRoot(),
     AuthenticationModule,
     MailModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService, ProfileService],
