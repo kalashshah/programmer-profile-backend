@@ -1,6 +1,10 @@
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import { AuthenticationService } from './authentication.service';
-import { SigninInput, SignupInput } from '../../src/graphql.types';
+import {
+  CheckCodeInput,
+  SigninInput,
+  SignupInput,
+} from '../../src/graphql.types';
 
 @Resolver('Authentication')
 export class AuthenticationResolver {
@@ -14,5 +18,10 @@ export class AuthenticationResolver {
   @Mutation('signin')
   async signin(@Args('input') input: SigninInput) {
     return await this.authenticationService.signin(input);
+  }
+
+  @Mutation('checkCode')
+  async checkCode(@Args('input') input: CheckCodeInput) {
+    return await this.authenticationService.checkCode(input);
   }
 }

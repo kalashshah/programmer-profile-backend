@@ -13,8 +13,16 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime!
   password: String!
+  isVerified: Boolean!
   followedByIds: [ID!]!
   followingIds: [ID!]!
+}
+
+type Token {
+  id: ID!
+  code: String!
+  email: String!
+  createdAt: DateTime!
 }
 
 # Signup
@@ -42,25 +50,31 @@ input ResetPasswordInput {
   confirmPassword: String!
 }
 
+input CheckCodeInput {
+  code: String!
+  email: String!
+}
+
 type SigninOutput {
   token: String!
   user: User!
 }
 
-type SignupOutput {
+type CheckCodeOutptut {
   token: String!
   user: User!
 }
 
 # Mutation for authentication
 type Mutation {
-  signup(input: SignupInput!): SignupOutput!
+  signup(input: SignupInput!): Boolean!
   signin(input: SigninInput!): SigninOutput!
   forgotPassword(input: ForgotPasswordInput!): Boolean!
   resetPassword(input: ResetPasswordInput!): Boolean!
+  checkCode(input: CheckCodeInput!): CheckCodeOutptut!
 }
 
 # Query for authentication
 type Query {
-  allUsers: [User!]!
+  _dummy: String
 }

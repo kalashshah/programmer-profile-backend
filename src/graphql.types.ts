@@ -29,6 +29,11 @@ export class ResetPasswordInput {
     confirmPassword: string;
 }
 
+export class CheckCodeInput {
+    code: string;
+    email: string;
+}
+
 export class User {
     id: string;
     name: string;
@@ -41,8 +46,16 @@ export class User {
     createdAt: DateTime;
     updatedAt: DateTime;
     password: string;
+    isVerified: boolean;
     followedByIds: string[];
     followingIds: string[];
+}
+
+export class Token {
+    id: string;
+    code: string;
+    email: string;
+    createdAt: DateTime;
 }
 
 export class SigninOutput {
@@ -50,23 +63,25 @@ export class SigninOutput {
     user: User;
 }
 
-export class SignupOutput {
+export class CheckCodeOutptut {
     token: string;
     user: User;
 }
 
 export abstract class IMutation {
-    abstract signup(input: SignupInput): SignupOutput | Promise<SignupOutput>;
+    abstract signup(input: SignupInput): boolean | Promise<boolean>;
 
     abstract signin(input: SigninInput): SigninOutput | Promise<SigninOutput>;
 
     abstract forgotPassword(input: ForgotPasswordInput): boolean | Promise<boolean>;
 
     abstract resetPassword(input: ResetPasswordInput): boolean | Promise<boolean>;
+
+    abstract checkCode(input: CheckCodeInput): CheckCodeOutptut | Promise<CheckCodeOutptut>;
 }
 
 export abstract class IQuery {
-    abstract allUsers(): User[] | Promise<User[]>;
+    abstract _dummy(): Nullable<string> | Promise<Nullable<string>>;
 }
 
 export type DateTime = any;

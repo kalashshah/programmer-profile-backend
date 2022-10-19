@@ -5,6 +5,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
+import { MailModule } from './mail/mail.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -15,7 +17,9 @@ import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
       driver: ApolloDriver,
       installSubscriptionHandlers: false,
     }),
+    ConfigModule.forRoot(),
     AuthenticationModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
