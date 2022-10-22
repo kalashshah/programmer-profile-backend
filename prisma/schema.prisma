@@ -17,7 +17,7 @@ model User {
   description        String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
-  githubUsername     String?
+  githubToken        String?
   leetcodeUsername   String?
   codeforcesUsername String?
   following          User[]   @relation("FollowingUser", fields: [followingIds], references: [id])

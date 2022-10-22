@@ -57,16 +57,14 @@ export class AppService {
     try {
       const response: any = await axios.post(
         `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
+        { headers: { Accept: 'application/vnd.github+json' } },
       );
       console.log(
         `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`,
       );
+      console.log('data', response.data);
+      console.log('access_token', response.data.access_token);
+      console.log('type', typeof response.data);
       let access_token = '';
       let i = 0;
       while (true) if (response.data[i++] === '=') break;
@@ -82,7 +80,7 @@ export class AppService {
       await this.prisma.user.update({
         where: { id: userId },
         data: {
-          githubUsername: access_token,
+          githubToken: access_token,
         },
       });
       return 'Github account linked successfully';
