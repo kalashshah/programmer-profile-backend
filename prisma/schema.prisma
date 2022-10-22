@@ -32,3 +32,10 @@ model Token {
   email     String   @unique
   createdAt DateTime @default(now())
 }
+
+model GithubAuth {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  state     String
+  createdAt DateTime @default(now())
+  userId    String   @unique @db.ObjectId
+}

@@ -36,6 +36,10 @@ export class CheckCodeInput {
     email: string;
 }
 
+export class AuthorizeGithubInput {
+    userId: string;
+}
+
 export class User {
     id: string;
     name: string;
@@ -80,10 +84,24 @@ export abstract class IMutation {
     abstract resetPassword(input: ResetPasswordInput): string | Promise<string>;
 
     abstract checkCode(input: CheckCodeInput): CheckCodeOutptut | Promise<CheckCodeOutptut>;
+
+    abstract authorizeGithub(input: AuthorizeGithubInput): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
 }
 
 export abstract class IQuery {
     abstract _dummy(): Nullable<string> | Promise<Nullable<string>>;
+}
+
+export class GithubAuth {
+    id: string;
+    state: string;
+    createdAt: DateTime;
+    userId: string;
+}
+
+export class AuthorizeGithubOutput {
+    state: string;
+    url: string;
 }
 
 export type DateTime = any;

@@ -1,0 +1,38 @@
+# User type
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  profilePicture: String
+  description: String
+  codeforcesUsername: String
+  githubUsername: String
+  leetcodeUsername: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  password: String!
+  isVerified: Boolean!
+  followedByIds: [ID!]!
+  followingIds: [ID!]!
+}
+
+type GithubAuth {
+  id: ID!
+  state: String!
+  createdAt: DateTime!
+  userId: ID!
+}
+
+input AuthorizeGithubInput {
+  userId: ID!
+}
+
+type AuthorizeGithubOutput {
+  state: String!
+  url: String!
+}
+
+type Mutation {
+  # Authorize user with Github
+  authorizeGithub(input: AuthorizeGithubInput!): AuthorizeGithubOutput!
+}

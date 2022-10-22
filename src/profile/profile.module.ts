@@ -4,6 +4,6 @@ import { ProfileResolver } from './profile.resolver';
 import { PrismaService } from 'prisma/prisma.service';
 
 @Module({
-  providers: [PrismaService, ProfileResolver, ProfileService],
+  providers: [PrismaService, ProfileResolver, ProfileService, PrismaService],
 })
 export class ProfileModule {}
