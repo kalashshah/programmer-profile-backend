@@ -32,7 +32,18 @@ type AuthorizeGithubOutput {
   url: String!
 }
 
+input AddUsernameInput {
+  username: String!
+  platform: Website!
+}
+
+enum Website {
+  CODEFORCES
+  LEETCODE
+}
+
 type Mutation {
   # Authorize user with Github
   authorizeGithub(input: AuthorizeGithubInput!): AuthorizeGithubOutput!
+  addUsername(input: AddUsernameInput!): String!
 }

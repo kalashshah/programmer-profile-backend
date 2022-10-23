@@ -3,20 +3,32 @@ import { BadRequestException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 
 import { PrismaService } from 'prisma/prisma.service';
+import { decode } from 'src/constants/decode';
 import { GITHUB_CLIENT_ID, GITHUB_SECRET_KEY } from 'src/constants/env';
-import { AuthorizeGithubInput, AuthorizeGithubOutput } from 'src/graphql.types';
+import {
+  AddUsernameInput,
+  AuthorizeGithubInput,
+  AuthorizeGithubOutput,
+  Website,
+} from 'src/graphql.types';
 
 @Injectable()
 export class ProfileService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * It takes in a user's token and returns a URL that the user can use to authorize their Github
+   * account
+   * @param {AuthorizeGithubInput} data - AuthorizeGithubInput
+   * @param {string} token - The JWT token that was generated when the user logged in.
+   * @returns The state and the url
+   */
   async authorizeGithub(
     data: AuthorizeGithubInput,
+    token: string,
   ): Promise<AuthorizeGithubOutput> {
-    const { userId } = data;
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+    const user = await decode(token, this.prisma);
+    const userId = user.id;
     if (!user) {
       throw new BadRequestException('User not found');
     }
@@ -33,6 +45,35 @@ export class ProfileService {
       state: newState,
       url: `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&state=${newState}`,
     };
+  }
+
+  /**
+   * It takes in a token and a username and platform, and updates the user's username for that platform
+   * @param {AddUsernameInput} data - AddUsernameInput
+   * @param {string} token - The token that was generated when the user logged in.
+   * @returns A string
+   */
+  async addUsername(data: AddUsernameInput, token: string): Promise<string> {
+    const user = await decode(token, this.prisma);
+    const userId = user.id;
+    const { username, platform } = data;
+    if (!username || !platform) {
+      throw new BadRequestException('Username and platform are required');
+    }
+    if (platform === Website.CODEFORCES) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { codeforcesUsername: username },
+      });
+    } else if (platform === Website.LEETCODE) {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { leetcodeUsername: username },
+      });
+    } else {
+      throw new BadRequestException('Invalid platform');
+    }
+    return 'Username added successfully';
   }
 
   /**

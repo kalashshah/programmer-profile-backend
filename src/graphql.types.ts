@@ -8,6 +8,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export enum Website {
+    CODEFORCES = "CODEFORCES",
+    LEETCODE = "LEETCODE"
+}
+
 export class SignupInput {
     name: string;
     email: string;
@@ -38,6 +43,11 @@ export class CheckCodeInput {
 
 export class AuthorizeGithubInput {
     userId: string;
+}
+
+export class AddUsernameInput {
+    username: string;
+    platform: Website;
 }
 
 export class User {
@@ -86,6 +96,8 @@ export abstract class IMutation {
     abstract checkCode(input: CheckCodeInput): CheckCodeOutptut | Promise<CheckCodeOutptut>;
 
     abstract authorizeGithub(input: AuthorizeGithubInput): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
+
+    abstract addUsername(input: AddUsernameInput): string | Promise<string>;
 }
 
 export abstract class IQuery {
