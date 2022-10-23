@@ -71,6 +71,10 @@ export class ProfileService {
     return 'Username added successfully';
   }
 
+  async getUser(token: string) {
+    return await decode(token, this.prisma);
+  }
+
   /**
    * It deletes all GithubAuth records that were created more than 10 minutes ago
    * and that belong to the given userId.

@@ -1,21 +1,3 @@
-# User type
-type User {
-  id: ID!
-  name: String!
-  email: String!
-  profilePicture: String
-  description: String
-  codeforcesUsername: String
-  githubUsername: String
-  leetcodeUsername: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  password: String!
-  isVerified: Boolean!
-  followedByIds: [ID!]!
-  followingIds: [ID!]!
-}
-
 type GithubAuth {
   id: ID!
   state: String!
@@ -46,4 +28,5 @@ type Mutation {
   # Authorize user with Github
   authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
   addUsername(input: AddUsernameInput!): String!
+  getUser(input: FakeInput): User!
 }

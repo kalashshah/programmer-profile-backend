@@ -98,6 +98,8 @@ export abstract class IMutation {
     abstract authorizeGithub(input?: Nullable<FakeInput>): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
 
     abstract addUsername(input: AddUsernameInput): string | Promise<string>;
+
+    abstract getUser(input?: Nullable<FakeInput>): User | Promise<User>;
 }
 
 export abstract class IQuery {

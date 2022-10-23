@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
-import { AddUsernameInput } from 'src/graphql.types';
+import { AddUsernameInput, User } from 'src/graphql.types';
 import { ProfileService } from './profile.service';
 
 @Resolver()
@@ -25,5 +25,14 @@ export class ProfileResolver {
     if (token === undefined)
       throw new Error('Invalid request, token not found');
     return this.profileService.addUsername(input, token);
+  }
+
+  @Mutation('getUser')
+  async getUser(@Context() context): Promise<User> {
+    const authorization = context.req.headers.authorization;
+    const token = authorization?.split(' ')[1];
+    if (token === undefined)
+      throw new Error('Invalid request, token not found');
+    return await this.profileService.getUser(token);
   }
 }
