@@ -7,7 +7,6 @@ import { decode } from 'src/constants/decode';
 import { GITHUB_CLIENT_ID, GITHUB_SECRET_KEY } from 'src/constants/env';
 import {
   AddUsernameInput,
-  AuthorizeGithubInput,
   AuthorizeGithubOutput,
   Website,
 } from 'src/graphql.types';
@@ -19,14 +18,10 @@ export class ProfileService {
   /**
    * It takes in a user's token and returns a URL that the user can use to authorize their Github
    * account
-   * @param {AuthorizeGithubInput} data - AuthorizeGithubInput
    * @param {string} token - The JWT token that was generated when the user logged in.
    * @returns The state and the url
    */
-  async authorizeGithub(
-    data: AuthorizeGithubInput,
-    token: string,
-  ): Promise<AuthorizeGithubOutput> {
+  async authorizeGithub(token: string): Promise<AuthorizeGithubOutput> {
     const user = await decode(token, this.prisma);
     const userId = user.id;
     if (!user) {

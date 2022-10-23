@@ -23,10 +23,6 @@ type GithubAuth {
   userId: ID!
 }
 
-input AuthorizeGithubInput {
-  userId: ID!
-}
-
 type AuthorizeGithubOutput {
   state: String!
   url: String!
@@ -42,8 +38,12 @@ enum Website {
   LEETCODE
 }
 
+input FakeInput {
+  _: Boolean
+}
+
 type Mutation {
   # Authorize user with Github
-  authorizeGithub(input: AuthorizeGithubInput!): AuthorizeGithubOutput!
+  authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
   addUsername(input: AddUsernameInput!): String!
 }

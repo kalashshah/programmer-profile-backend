@@ -41,13 +41,13 @@ export class CheckCodeInput {
     email: string;
 }
 
-export class AuthorizeGithubInput {
-    userId: string;
-}
-
 export class AddUsernameInput {
     username: string;
     platform: Website;
+}
+
+export class FakeInput {
+    _?: Nullable<boolean>;
 }
 
 export class User {
@@ -95,7 +95,7 @@ export abstract class IMutation {
 
     abstract checkCode(input: CheckCodeInput): CheckCodeOutptut | Promise<CheckCodeOutptut>;
 
-    abstract authorizeGithub(input: AuthorizeGithubInput): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
+    abstract authorizeGithub(input?: Nullable<FakeInput>): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
 
     abstract addUsername(input: AddUsernameInput): string | Promise<string>;
 }
