@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Context, Query } from '@nestjs/graphql';
 import { AddUsernameInput, User } from 'src/graphql.types';
 import { ProfileService } from './profile.service';
 
@@ -27,7 +27,7 @@ export class ProfileResolver {
     return this.profileService.addUsername(input, token);
   }
 
-  @Mutation('getUser')
+  @Query('getUser')
   async getUser(@Context() context): Promise<User> {
     const authorization = context.req.headers.authorization;
     const token = authorization?.split(' ')[1];

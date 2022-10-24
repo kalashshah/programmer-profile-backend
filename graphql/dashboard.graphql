@@ -1,0 +1,19 @@
+type Contribution {
+  date: DateTime!
+  githubContributions: Int
+  codeforcesContributions: Int
+  leetcodeContributions: Int
+}
+
+# contribution
+type ContributionGraph {
+  totalContributions: Int!
+  totalGithubContributions: Int
+  totalCodeforcesContributions: Int
+  totalLeetcodeContributions: Int
+  contributions: [Contribution!]!
+}
+
+type Query {
+  contributionGraph(input: FakeInput): ContributionGraph!
+}

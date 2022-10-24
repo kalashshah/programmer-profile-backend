@@ -57,7 +57,7 @@ export class User {
     profilePicture?: Nullable<string>;
     description?: Nullable<string>;
     codeforcesUsername?: Nullable<string>;
-    githubUsername?: Nullable<string>;
+    githubToken?: Nullable<string>;
     leetcodeUsername?: Nullable<string>;
     createdAt: DateTime;
     updatedAt: DateTime;
@@ -98,12 +98,27 @@ export abstract class IMutation {
     abstract authorizeGithub(input?: Nullable<FakeInput>): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
 
     abstract addUsername(input: AddUsernameInput): string | Promise<string>;
+}
 
-    abstract getUser(input?: Nullable<FakeInput>): User | Promise<User>;
+export class Contribution {
+    date: DateTime;
+    githubContributions?: Nullable<number>;
+    codeforcesContributions?: Nullable<number>;
+    leetcodeContributions?: Nullable<number>;
+}
+
+export class ContributionGraph {
+    totalContributions: number;
+    totalGithubContributions?: Nullable<number>;
+    totalCodeforcesContributions?: Nullable<number>;
+    totalLeetcodeContributions?: Nullable<number>;
+    contributions: Contribution[];
 }
 
 export abstract class IQuery {
-    abstract _dummy(): Nullable<string> | Promise<Nullable<string>>;
+    abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
+
+    abstract getUser(): User | Promise<User>;
 }
 
 export class GithubAuth {

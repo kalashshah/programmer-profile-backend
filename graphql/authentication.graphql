@@ -8,7 +8,7 @@ type User {
   profilePicture: String
   description: String
   codeforcesUsername: String
-  githubUsername: String
+  githubToken: String
   leetcodeUsername: String
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -74,9 +74,4 @@ type Mutation {
   forgotPassword(input: ForgotPasswordInput!): String!
   resetPassword(input: ResetPasswordInput!): String!
   checkCode(input: CheckCodeInput!): CheckCodeOutptut!
-}
-
-# Query for authentication
-type Query {
-  _dummy: String
 }

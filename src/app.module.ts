@@ -10,6 +10,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ProfileService } from './profile/profile.service';
 import { ProfileModule } from './profile/profile.module';
 import { PrismaService } from 'prisma/prisma.service';
+import { DashboardService } from './dashboard/dashboard.service';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -24,8 +26,9 @@ import { PrismaService } from 'prisma/prisma.service';
     AuthenticationModule,
     MailModule,
     ProfileModule,
+    DashboardModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ProfileService, PrismaService],
+  providers: [AppService, ProfileService, PrismaService, DashboardService],
 })
 export class AppModule {}

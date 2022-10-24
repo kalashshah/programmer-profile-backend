@@ -28,5 +28,8 @@ type Mutation {
   # Authorize user with Github
   authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
   addUsername(input: AddUsernameInput!): String!
-  getUser(input: FakeInput): User!
+}
+
+type Query {
+  getUser: User!
 }
