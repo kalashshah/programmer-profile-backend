@@ -13,6 +13,11 @@ export enum Website {
     LEETCODE = "LEETCODE"
 }
 
+export enum ToggleAction {
+    ADD = "ADD",
+    REMOVE = "REMOVE"
+}
+
 export class SignupInput {
     name: string;
     email: string;
@@ -53,6 +58,11 @@ export class FakeInput {
 export class SearchInput {
     query: string;
     page?: Nullable<number>;
+}
+
+export class ToggleFollowInput {
+    userId: string;
+    action: ToggleAction;
 }
 
 export class User {
@@ -103,6 +113,8 @@ export abstract class IMutation {
     abstract authorizeGithub(input?: Nullable<FakeInput>): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
 
     abstract addUsername(input: AddUsernameInput): string | Promise<string>;
+
+    abstract toggleFollow(input: ToggleFollowInput): string | Promise<string>;
 }
 
 export class Contribution {
@@ -125,7 +137,7 @@ export abstract class IQuery {
 
     abstract getUser(): User | Promise<User>;
 
-    abstract search(input: SearchInput): RestrictedUser[] | Promise<RestrictedUser[]>;
+    abstract search(input: SearchInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 }
 
 export class GithubAuth {
@@ -140,7 +152,7 @@ export class AuthorizeGithubOutput {
     url: string;
 }
 
-export class RestrictedUser {
+export class RestrictedUserSelf {
     id: string;
     name: string;
     email: string;
@@ -149,6 +161,16 @@ export class RestrictedUser {
     codeforcesUsername?: Nullable<string>;
     leetcodeUsername?: Nullable<string>;
     githubToken?: Nullable<string>;
+}
+
+export class RestrictedUserOther {
+    id: string;
+    name: string;
+    email: string;
+    profilePicture?: Nullable<string>;
+    description?: Nullable<string>;
+    codeforcesUsername?: Nullable<string>;
+    leetcodeUsername?: Nullable<string>;
 }
 
 export type DateTime = any;

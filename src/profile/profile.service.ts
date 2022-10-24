@@ -9,7 +9,9 @@ import { PAGINATION_LIMIT } from 'src/constants/constants';
 import {
   AddUsernameInput,
   AuthorizeGithubOutput,
-  RestrictedUser,
+  RestrictedUserOther,
+  RestrictedUserSelf,
+  ToggleFollowInput,
   Website,
 } from 'src/graphql.types';
 
@@ -73,7 +75,7 @@ export class ProfileService {
     return 'Username added successfully';
   }
 
-  async search(query: string, page: number): Promise<RestrictedUser[]> {
+  async search(query: string, page: number): Promise<RestrictedUserOther[]> {
     const users = await this.prisma.user.findMany({
       where: {
         isVerified: true,
@@ -123,8 +125,47 @@ export class ProfileService {
     return users;
   }
 
-  async getUser(token: string) {
-    return await decode(token, this.prisma);
+  /**
+   * It takes a userId and toggles the follower-following relationship between the current user
+   * and the user with the given userId.
+   * @param {ToggleFollowInput} data - ToggleFollowInput
+   * @param {string} token - The token that was generated when the user logged in.
+   * @returns A string
+   */
+  async toggleFollow(data: ToggleFollowInput, token: string): Promise<string> {
+    const user = await decode(token, this.prisma);
+    const userId = user.id;
+    const friendId = data.userId;
+    if (data.action === 'ADD') {
+      await this.addFollowing(userId, friendId);
+      await this.addFollowedBy(userId, friendId);
+    } else if (data.action === 'REMOVE') {
+      await this.removeFollowing(userId, friendId);
+      await this.removeFollowedBy(userId, friendId);
+    } else {
+      throw new BadRequestException('Invalid action');
+    }
+    return 'Follow toggled successfully';
+  }
+
+  /**
+   * It takes a token, decodes it, and returns the user's information
+   * including private information of the user.
+   * @param {string} token - The token that was sent to the client.
+   * @returns RestrictedUserSelf - The user's information.
+   */
+  async getUser(token: string): Promise<RestrictedUserSelf> {
+    const user = await decode(token, this.prisma);
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      codeforcesUsername: user.codeforcesUsername,
+      description: user.description,
+      leetcodeUsername: user.leetcodeUsername,
+      profilePicture: user.profilePicture,
+      githubToken: user.githubToken,
+    };
   }
 
   /**
@@ -152,5 +193,84 @@ export class ProfileService {
    */
   createState(userId: string) {
     return jwt.sign({ userId }, GITHUB_SECRET_KEY);
+  }
+
+  /**
+   * It takes in a userId and a toFollowId, and then it updates the user
+   * with the userId such that it follows the user with the toFollowId.
+   * @param {string} userId - The id of the user who is following
+   * @param {string} toFollowId - The id of the user you want to follow
+   * @returns The updated user object.
+   */
+  async addFollowing(userId: string, toFollowId: string) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        following: {
+          connect: {
+            id: toFollowId,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Connect the user with the id of userId to the followedBy field of the user with the id of
+   * toFollowId such that the user with the id of toFollowId is now followed by the user with the id of userId.
+   * @param {string} userId - The id of the user who is following
+   * @param {string} toFollowId - The id of the user that is being followed
+   */
+  async addFollowedBy(userId: string, toFollowId: string) {
+    await this.prisma.user.update({
+      where: { id: toFollowId },
+      data: {
+        followedBy: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * It takes in a userId and a friendId, and then it updates the user with the userId to
+   * disconnect the friend with the friendId from the user's following list
+   * This means that the user with the userId will no longer follow the user with the friendId.
+   * @param {string} userId - The id of the user who is following
+   * @param {string} friendId - The id of the user you want to unfollow.
+   * @returns The user object with the updated following array.
+   */
+  async removeFollowing(userId: string, friendId: string) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        following: {
+          disconnect: {
+            id: friendId,
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Remove the user with the given userId from the followedBy array of the user with the given
+   * friendId. This means that the user with the friendId will no longer be followed by the user with the userId.
+   * @param {string} userId - The id of the user who is following the friend
+   * @param {string} friendId - The id of the user that is being followed
+   */
+  async removeFollowedBy(userId: string, friendId: string) {
+    await this.prisma.user.update({
+      where: { id: friendId },
+      data: {
+        followedBy: {
+          disconnect: {
+            id: userId,
+          },
+        },
+      },
+    });
   }
 }

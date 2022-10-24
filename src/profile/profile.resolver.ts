@@ -1,9 +1,10 @@
 import { Resolver, Mutation, Args, Context, Query } from '@nestjs/graphql';
 import {
   AddUsernameInput,
-  RestrictedUser,
-  User,
   SearchInput,
+  ToggleFollowInput,
+  RestrictedUserSelf,
+  RestrictedUserOther,
 } from 'src/graphql.types';
 import { ProfileService } from './profile.service';
 
@@ -33,7 +34,7 @@ export class ProfileResolver {
   }
 
   @Query('getUser')
-  async getUser(@Context() context): Promise<User> {
+  async getUser(@Context() context): Promise<RestrictedUserSelf> {
     const authorization = context.req.headers.authorization;
     const token = authorization?.split(' ')[1];
     if (token === undefined)
@@ -45,11 +46,23 @@ export class ProfileResolver {
   async search(
     @Args('input') input: SearchInput,
     @Context() context,
-  ): Promise<RestrictedUser[]> {
+  ): Promise<RestrictedUserOther[]> {
     const authorization = context.req.headers.authorization;
     const token = authorization?.split(' ')[1];
     if (token === undefined)
       throw new Error('Invalid request, token not found');
     return await this.profileService.search(input.query, input?.page || 1);
+  }
+
+  @Mutation('toggleFollow')
+  async toggleFollow(
+    @Args('input') input: ToggleFollowInput,
+    @Context() context,
+  ): Promise<string> {
+    const authorization = context.req.headers.authorization;
+    const token = authorization?.split(' ')[1];
+    if (token === undefined)
+      throw new Error('Invalid request, token not found');
+    return await this.profileService.toggleFollow(input, token);
   }
 }

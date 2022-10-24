@@ -10,7 +10,7 @@ type AuthorizeGithubOutput {
   url: String!
 }
 
-type RestrictedUser {
+type RestrictedUserSelf {
   id: ID!
   name: String!
   email: String!
@@ -19,6 +19,16 @@ type RestrictedUser {
   codeforcesUsername: String
   leetcodeUsername: String
   githubToken: String
+}
+
+type RestrictedUserOther {
+  id: ID!
+  name: String!
+  email: String!
+  profilePicture: String
+  description: String
+  codeforcesUsername: String
+  leetcodeUsername: String
 }
 
 input AddUsernameInput {
@@ -40,13 +50,24 @@ input SearchInput {
   page: Int
 }
 
+enum ToggleAction {
+  ADD
+  REMOVE
+}
+
+input ToggleFollowInput {
+  userId: ID!
+  action: ToggleAction!
+}
+
 type Mutation {
   # Authorize user with Github
   authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
   addUsername(input: AddUsernameInput!): String!
+  toggleFollow(input: ToggleFollowInput!): String!
 }
 
 type Query {
   getUser: User!
-  search(input: SearchInput!): [RestrictedUser!]!
+  search(input: SearchInput!): [RestrictedUserOther!]!
 }
