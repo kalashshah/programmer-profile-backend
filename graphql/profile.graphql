@@ -10,6 +10,17 @@ type AuthorizeGithubOutput {
   url: String!
 }
 
+type RestrictedUser {
+  id: ID!
+  name: String!
+  email: String!
+  profilePicture: String
+  description: String
+  codeforcesUsername: String
+  leetcodeUsername: String
+  githubToken: String
+}
+
 input AddUsernameInput {
   username: String!
   platform: Website!
@@ -24,6 +35,11 @@ input FakeInput {
   _: Boolean
 }
 
+input SearchInput {
+  query: String!
+  page: Int
+}
+
 type Mutation {
   # Authorize user with Github
   authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
@@ -32,4 +48,5 @@ type Mutation {
 
 type Query {
   getUser: User!
+  search(input: SearchInput!): [RestrictedUser!]!
 }

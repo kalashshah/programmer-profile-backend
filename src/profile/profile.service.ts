@@ -5,9 +5,11 @@ import * as jwt from 'jsonwebtoken';
 import { PrismaService } from 'prisma/prisma.service';
 import { decode } from 'src/constants/decode';
 import { GITHUB_CLIENT_ID, GITHUB_SECRET_KEY } from 'src/constants/env';
+import { PAGINATION_LIMIT } from 'src/constants/constants';
 import {
   AddUsernameInput,
   AuthorizeGithubOutput,
+  RestrictedUser,
   Website,
 } from 'src/graphql.types';
 
@@ -69,6 +71,56 @@ export class ProfileService {
       throw new BadRequestException('Invalid platform');
     }
     return 'Username added successfully';
+  }
+
+  async search(query: string, page: number): Promise<RestrictedUser[]> {
+    const users = await this.prisma.user.findMany({
+      where: {
+        isVerified: true,
+        OR: [
+          {
+            codeforcesUsername: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            leetcodeUsername: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            name: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+      orderBy: {
+        name: 'asc',
+      },
+      skip: (page - 1) * PAGINATION_LIMIT,
+      take: PAGINATION_LIMIT,
+      distinct: ['id'],
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        codeforcesUsername: true,
+        leetcodeUsername: true,
+        description: true,
+        profilePicture: true,
+      },
+    });
+    return users;
   }
 
   async getUser(token: string) {

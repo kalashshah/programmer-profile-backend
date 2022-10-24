@@ -1,5 +1,10 @@
 import { Resolver, Mutation, Args, Context, Query } from '@nestjs/graphql';
-import { AddUsernameInput, User } from 'src/graphql.types';
+import {
+  AddUsernameInput,
+  RestrictedUser,
+  User,
+  SearchInput,
+} from 'src/graphql.types';
 import { ProfileService } from './profile.service';
 
 @Resolver()
@@ -34,5 +39,17 @@ export class ProfileResolver {
     if (token === undefined)
       throw new Error('Invalid request, token not found');
     return await this.profileService.getUser(token);
+  }
+
+  @Query('search')
+  async search(
+    @Args('input') input: SearchInput,
+    @Context() context,
+  ): Promise<RestrictedUser[]> {
+    const authorization = context.req.headers.authorization;
+    const token = authorization?.split(' ')[1];
+    if (token === undefined)
+      throw new Error('Invalid request, token not found');
+    return await this.profileService.search(input.query, input?.page || 1);
   }
 }

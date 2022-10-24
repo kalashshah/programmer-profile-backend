@@ -50,6 +50,11 @@ export class FakeInput {
     _?: Nullable<boolean>;
 }
 
+export class SearchInput {
+    query: string;
+    page?: Nullable<number>;
+}
+
 export class User {
     id: string;
     name: string;
@@ -119,6 +124,8 @@ export abstract class IQuery {
     abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
 
     abstract getUser(): User | Promise<User>;
+
+    abstract search(input: SearchInput): RestrictedUser[] | Promise<RestrictedUser[]>;
 }
 
 export class GithubAuth {
@@ -131,6 +138,17 @@ export class GithubAuth {
 export class AuthorizeGithubOutput {
     state: string;
     url: string;
+}
+
+export class RestrictedUser {
+    id: string;
+    name: string;
+    email: string;
+    profilePicture?: Nullable<string>;
+    description?: Nullable<string>;
+    codeforcesUsername?: Nullable<string>;
+    leetcodeUsername?: Nullable<string>;
+    githubToken?: Nullable<string>;
 }
 
 export type DateTime = any;
