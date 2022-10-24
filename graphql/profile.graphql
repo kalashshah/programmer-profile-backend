@@ -60,6 +60,10 @@ input ToggleFollowInput {
   action: ToggleAction!
 }
 
+input PaginationInput {
+  page: Int
+}
+
 type Mutation {
   # Authorize user with Github
   authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
@@ -70,4 +74,6 @@ type Mutation {
 type Query {
   getUser: User!
   search(input: SearchInput!): [RestrictedUserOther!]!
+  getFollowers(input: PaginationInput): [RestrictedUserOther!]!
+  getFollowing(input: PaginationInput): [RestrictedUserOther!]!
 }

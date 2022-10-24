@@ -169,6 +169,75 @@ export class ProfileService {
   }
 
   /**
+   * It returns a list of users who follow the current user.
+   * @param {number} page - The page number of the paginated list.
+   * @param {string} token - The token of the user who is requesting the followers.
+   * @returns An array of restricted user objects.
+   */
+  async getFollowers(
+    page: number,
+    token: string,
+  ): Promise<RestrictedUserOther[]> {
+    const user = await decode(token, this.prisma);
+    const userId = user.id;
+    const followers = await this.prisma.user.findMany({
+      where: {
+        followedBy: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        codeforcesUsername: true,
+        leetcodeUsername: true,
+        description: true,
+        profilePicture: true,
+      },
+      skip: (page - 1) * PAGINATION_LIMIT,
+      take: PAGINATION_LIMIT,
+    });
+    return followers;
+  }
+
+  /**
+   * It returns a list of users who are following the current user.
+   * @param {number} page - The page number of the paginated list.
+   * @param {string} token - The token of the user who is requesting the data.
+   * @returns An array of restricted user objects.
+   */
+  async getFollowing(
+    page: number,
+    token: string,
+  ): Promise<RestrictedUserOther[]> {
+    const user = await decode(token, this.prisma);
+    const userId = user.id;
+    const following = await this.prisma.user.findMany({
+      where: {
+        following: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        codeforcesUsername: true,
+        leetcodeUsername: true,
+        description: true,
+        profilePicture: true,
+      },
+      skip: (page - 1) * PAGINATION_LIMIT,
+      take: PAGINATION_LIMIT,
+    });
+    return following;
+  }
+  /**
    * It deletes all GithubAuth records that were created more than 10 minutes ago
    * and that belong to the given userId.
    * @param {string} userId - The user's ID.

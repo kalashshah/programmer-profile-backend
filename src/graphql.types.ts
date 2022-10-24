@@ -65,6 +65,10 @@ export class ToggleFollowInput {
     action: ToggleAction;
 }
 
+export class PaginationInput {
+    page?: Nullable<number>;
+}
+
 export class User {
     id: string;
     name: string;
@@ -138,6 +142,10 @@ export abstract class IQuery {
     abstract getUser(): User | Promise<User>;
 
     abstract search(input: SearchInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
+
+    abstract getFollowers(input?: Nullable<PaginationInput>): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
+
+    abstract getFollowing(input?: Nullable<PaginationInput>): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 }
 
 export class GithubAuth {
