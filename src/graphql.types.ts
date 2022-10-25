@@ -81,6 +81,10 @@ export class PaginationInput {
     page?: Nullable<number>;
 }
 
+export class DescriptionInput {
+    description: string;
+}
+
 export class User {
     id: string;
     name: string;
@@ -136,6 +140,8 @@ export abstract class IMutation {
     abstract addUsername(input: AddUsernameInput): string | Promise<string>;
 
     abstract toggleFollow(input: ToggleFollowInput): string | Promise<string>;
+
+    abstract addDescription(input: DescriptionInput): string | Promise<string>;
 }
 
 export class Contribution {

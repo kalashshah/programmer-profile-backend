@@ -250,6 +250,17 @@ export class ProfileService {
     });
     return following;
   }
+
+  async addDescription(description: string, token: string): Promise<string> {
+    const user = await decode(token, this.prisma);
+    const userId = user.id;
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { description },
+    });
+    return 'Description added successfully';
+  }
+
   /**
    * It deletes all GithubAuth records that were created more than 10 minutes ago
    * and that belong to the given userId.

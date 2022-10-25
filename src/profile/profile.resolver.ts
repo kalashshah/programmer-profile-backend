@@ -6,6 +6,7 @@ import {
   RestrictedUserSelf,
   RestrictedUserOther,
   PaginationInput,
+  DescriptionInput,
 } from 'src/graphql.types';
 import { ProfileService } from './profile.service';
 
@@ -89,5 +90,16 @@ export class ProfileResolver {
     if (token === undefined)
       throw new Error('Invalid request, token not found');
     return await this.profileService.getFollowing(input?.page || 1, token);
+  }
+
+  @Mutation('addDescription')
+  async addDescription(
+    @Args('input') input: DescriptionInput,
+    @Context() context,
+  ): Promise<string> {
+    const token = context?.req?.headers?.authorization?.split(' ')[1];
+    if (token === undefined)
+      throw new Error('Invalid request, token not found');
+    return await this.profileService.addDescription(input.description, token);
   }
 }

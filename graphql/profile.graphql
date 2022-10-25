@@ -64,11 +64,16 @@ input PaginationInput {
   page: Int
 }
 
+input DescriptionInput {
+  description: String!
+}
+
 type Mutation {
   # Authorize user with Github
   authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
   addUsername(input: AddUsernameInput!): String!
   toggleFollow(input: ToggleFollowInput!): String!
+  addDescription(input: DescriptionInput!): String!
 }
 
 type Query {
