@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
@@ -9,10 +12,15 @@ import {
 import { PrismaService } from 'prisma/prisma.service';
 import { GithubCallbackQuery } from './constants/profile.types';
 import * as jwt from 'jsonwebtoken';
+import { decode } from './constants/decode';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Injectable()
 export class AppService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cloudinary: CloudinaryService,
+  ) {}
 
   getHello(): string {
     return 'Hello from B-704';
@@ -86,6 +94,32 @@ export class AppService {
       return 'Github account linked successfully';
     } catch (error) {
       throw new Error('Github code is either invalid or expired');
+    }
+  }
+
+  async uploadProfilePicture(
+    file: Express.Multer.File,
+    token: string,
+  ): Promise<string> {
+    console.log(file);
+    try {
+      const user = await decode(token, this.prisma);
+      const upload = await this.cloudinary.uploadImage(file);
+      if (user.profilePicturePublicId) {
+        await this.cloudinary.deleteImage(user.profilePicturePublicId);
+      }
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          profilePicture: upload.secure_url,
+          profilePicturePublicId: upload.public_id,
+        },
+      });
+      return upload.secure_url;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        error.message || 'Internal error, could not upload profile picture',
+      );
     }
   }
 }

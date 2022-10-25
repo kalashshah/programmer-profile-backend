@@ -74,6 +74,7 @@ export class User {
     name: string;
     email: string;
     profilePicture?: Nullable<string>;
+    profilePicturePublicId?: Nullable<string>;
     description?: Nullable<string>;
     codeforcesUsername?: Nullable<string>;
     githubToken?: Nullable<string>;
@@ -139,7 +140,7 @@ export class ContributionGraph {
 export abstract class IQuery {
     abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
 
-    abstract getUser(): User | Promise<User>;
+    abstract getUser(): RestrictedUserSelf | Promise<RestrictedUserSelf>;
 
     abstract search(input: SearchInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 

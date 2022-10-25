@@ -12,6 +12,8 @@ import { ProfileModule } from './profile/profile.module';
 import { PrismaService } from 'prisma/prisma.service';
 import { DashboardService } from './dashboard/dashboard.service';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Module({
   imports: [
@@ -27,8 +29,15 @@ import { DashboardModule } from './dashboard/dashboard.module';
     MailModule,
     ProfileModule,
     DashboardModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ProfileService, PrismaService, DashboardService],
+  providers: [
+    AppService,
+    ProfileService,
+    PrismaService,
+    DashboardService,
+    CloudinaryService,
+  ],
 })
 export class AppModule {}

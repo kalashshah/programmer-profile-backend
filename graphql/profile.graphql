@@ -72,7 +72,7 @@ type Mutation {
 }
 
 type Query {
-  getUser: User!
+  getUser: RestrictedUserSelf!
   search(input: SearchInput!): [RestrictedUserOther!]!
   getFollowers(input: PaginationInput): [RestrictedUserOther!]!
   getFollowing(input: PaginationInput): [RestrictedUserOther!]!

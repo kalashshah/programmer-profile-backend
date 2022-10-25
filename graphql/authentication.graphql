@@ -6,6 +6,7 @@ type User {
   name: String!
   email: String!
   profilePicture: String
+  profilePicturePublicId: String
   description: String
   codeforcesUsername: String
   githubToken: String
