@@ -14,6 +14,8 @@ import { DashboardService } from './dashboard/dashboard.service';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
+import { NotificationModule } from './notification/notification.module';
+import { NotificationService } from './notification/notification.service';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
     ProfileModule,
     DashboardModule,
     CloudinaryModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
@@ -38,6 +41,7 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
     PrismaService,
     DashboardService,
     CloudinaryService,
+    NotificationService,
   ],
 })
 export class AppModule {}

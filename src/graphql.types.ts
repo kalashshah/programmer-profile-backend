@@ -8,6 +8,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export enum NotificationType {
+    FOLLOWING = "FOLLOWING"
+}
+
 export enum Website {
     CODEFORCES = "CODEFORCES",
     LEETCODE = "LEETCODE"
@@ -44,6 +48,14 @@ export class ResetPasswordInput {
 export class CheckCodeInput {
     code: string;
     email: string;
+}
+
+export class SeeNotificationInput {
+    notificationId: string;
+}
+
+export class SeeNotificationsInput {
+    notificationIds: string[];
 }
 
 export class AddUsernameInput {
@@ -115,6 +127,10 @@ export abstract class IMutation {
 
     abstract checkCode(input: CheckCodeInput): CheckCodeOutptut | Promise<CheckCodeOutptut>;
 
+    abstract seeNotification(input: SeeNotificationInput): string | Promise<string>;
+
+    abstract seeNotifications(input: SeeNotificationsInput): string | Promise<string>;
+
     abstract authorizeGithub(input?: Nullable<FakeInput>): AuthorizeGithubOutput | Promise<AuthorizeGithubOutput>;
 
     abstract addUsername(input: AddUsernameInput): string | Promise<string>;
@@ -140,6 +156,8 @@ export class ContributionGraph {
 export abstract class IQuery {
     abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
 
+    abstract notifications(): NotificationOutput | Promise<NotificationOutput>;
+
     abstract getUser(): RestrictedUserSelf | Promise<RestrictedUserSelf>;
 
     abstract search(input: SearchInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
@@ -147,6 +165,22 @@ export abstract class IQuery {
     abstract getFollowers(input?: Nullable<PaginationInput>): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 
     abstract getFollowing(input?: Nullable<PaginationInput>): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
+}
+
+export class Notification {
+    id: string;
+    description: string;
+    createdAt: DateTime;
+    seenAt?: Nullable<DateTime>;
+    seenStatus: boolean;
+    user?: Nullable<User>;
+    userId?: Nullable<string>;
+    notificationType: NotificationType;
+}
+
+export class NotificationOutput {
+    notifications: Notification[];
+    unseenNotifications: number;
 }
 
 export class GithubAuth {

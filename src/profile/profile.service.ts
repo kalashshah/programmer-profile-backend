@@ -14,10 +14,15 @@ import {
   ToggleFollowInput,
   Website,
 } from 'src/graphql.types';
+import { NotificationService } from 'src/notification/notification.service';
+import { followingNotification } from 'src/constants/notifications';
 
 @Injectable()
 export class ProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notif: NotificationService,
+  ) {}
 
   /**
    * It takes in a user's token and returns a URL that the user can use to authorize their Github
@@ -136,9 +141,17 @@ export class ProfileService {
     const user = await decode(token, this.prisma);
     const userId = user.id;
     const friendId = data.userId;
+    if (friendId === userId) {
+      throw new BadRequestException('You cannot follow or unfollow yourself');
+    }
     if (data.action === 'ADD') {
       await this.addFollowing(userId, friendId);
       await this.addFollowedBy(userId, friendId);
+      await this.notif.sendNotification(
+        friendId,
+        followingNotification(user.name),
+        'FOLLOWING',
+      );
     } else if (data.action === 'REMOVE') {
       await this.removeFollowing(userId, friendId);
       await this.removeFollowedBy(userId, friendId);
