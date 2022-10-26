@@ -66,7 +66,9 @@ export class AppController {
       res.status(400).send('Invalid request, file is not an image');
     }
     try {
-      return await this.appService.uploadProfilePicture(file, token);
+      res
+        .status(200)
+        .send(await this.appService.uploadProfilePicture(file, token));
     } catch (error) {
       res.status(400).send(error.message);
     }
