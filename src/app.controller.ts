@@ -8,10 +8,10 @@ import {
   Headers,
   UploadedFile,
   UseInterceptors,
-  UnauthorizedException,
-  BadRequestException,
+  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
 import { AppService } from './app.service';
 import { GithubCallbackQuery } from './constants/profile.types';
 
@@ -52,18 +52,23 @@ export class AppController {
   async uploadProfilePicture(
     @UploadedFile() file: Express.Multer.File,
     @Headers('authorization') authorization: string,
+    @Res() res: Response,
   ) {
     console.log('called');
     const token = authorization?.split(' ')[1];
     if (!token) {
-      throw new UnauthorizedException('Invalid request, token not found');
+      res.status(401).send('Invalid request, token not found');
     }
     if (!file) {
-      throw new BadRequestException('Invalid request, file not found');
+      res.status(400).send('Invalid request, file not found');
     }
     if (!file.mimetype.startsWith('image')) {
-      throw new BadRequestException('Invalid request, file is not an image');
+      res.status(400).send('Invalid request, file is not an image');
     }
-    return await this.appService.uploadProfilePicture(file, token);
+    try {
+      await this.appService.uploadProfilePicture(file, token);
+    } catch (error) {
+      res.status(400).send(error.message);
+    }
   }
 }
