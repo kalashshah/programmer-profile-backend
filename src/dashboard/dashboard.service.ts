@@ -9,10 +9,12 @@ import {
   pinnedRepos,
   getCFRatingGraph,
   getCFTagandProblemGraph,
+  getGithubGraphsTogether,
 } from 'src/constants/profile.data';
 import {
   CodeforcesGraphsOutput,
   ContributionGraph,
+  GithubGraphsOutput,
   User,
 } from 'src/graphql.types';
 
@@ -57,7 +59,9 @@ export class DashboardService {
     return [];
   }
 
-  async codeforcesGraphs(token: string): Promise<CodeforcesGraphsOutput> {
+  async codeforcesGraphs(
+    token: string,
+  ): Promise<CodeforcesGraphsOutput | null> {
     const user = await decode(token, this.prisma);
     if (user.codeforcesUsername) {
       try {
@@ -74,11 +78,19 @@ export class DashboardService {
         throw new Error('Codeforces username is invalid');
       }
     }
-    return {
-      barGraph: { problemRatingGraph: [] },
-      donutGraph: { problemTagGraph: [] },
-      ratingGraph: { ratings: [] },
-    };
+    return null;
+  }
+
+  async githubGraphs(token: string): Promise<GithubGraphsOutput | null> {
+    const user = await decode(token, this.prisma);
+    if (user.githubToken) {
+      try {
+        const githubUsername = await getGithubUsername(user.githubToken);
+        return await getGithubGraphsTogether(githubUsername, user.githubToken);
+      } catch (err) {
+        throw new Error(err?.message || 'Github token is invalid');
+      }
+    }
   }
 
   async fillCodeforcesData(user: User, contributionGraph: ContributionGraph) {

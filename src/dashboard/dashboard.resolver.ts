@@ -1,5 +1,5 @@
 import { Context, Query, Resolver } from '@nestjs/graphql';
-import { CodeforcesGraphsOutput } from 'src/graphql.types';
+import { CodeforcesGraphsOutput, GithubGraphsOutput } from 'src/graphql.types';
 import { DashboardService } from './dashboard.service';
 
 @Resolver()
@@ -22,6 +22,12 @@ export class DashboardResolver {
   async codeforcesGraphs(@Context() context): Promise<CodeforcesGraphsOutput> {
     const token = this.checkHeader(context?.req?.headers?.authorization);
     return await this.dashboardService.codeforcesGraphs(token);
+  }
+
+  @Query('githubGraphs')
+  async githubGraphs(@Context() context): Promise<GithubGraphsOutput> {
+    const token = this.checkHeader(context?.req?.headers?.authorization);
+    return await this.dashboardService.githubGraphs(token);
   }
 
   checkHeader = (authorization: string) => {

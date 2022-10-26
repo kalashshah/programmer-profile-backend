@@ -3,6 +3,10 @@ import {
   CFProblemRating,
   CFProblemTag,
   CFRating,
+  GithubGraphsOutput,
+  GithubLanguage,
+  GithubStatistics,
+  GithubStreakGraph,
   Repository,
 } from 'src/graphql.types';
 
@@ -235,8 +239,206 @@ export const getCFTagandProblemGraph = async (
     ratingMap.forEach((value, key) =>
       ratingArray.push({ difficulty: key, problemsCount: value }),
     );
+    tagArray.sort((a, b) => b.problemsCount - a.problemsCount);
+    ratingArray.sort((a, b) => a.difficulty - b.difficulty);
     return { tagArray, ratingArray };
   } catch (error) {
     throw new Error('Incorrect Codeforces username');
   }
+};
+
+const GITHUB_GRAPH_DATA = `
+query userInfo($userName: String!) {
+  user(login: $userName) {
+    followers {
+      totalCount
+    }
+    following {
+      totalCount
+    }
+    repositories(ownerAffiliations: OWNER, isFork: false, first: 100) {
+      totalCount
+      nodes {
+        name
+        forkCount
+        languages(first: 20, orderBy: {field: SIZE, direction: DESC}) {
+          edges {
+            size
+            node {
+              color
+              name
+            }
+          }
+        }
+        watchers {
+          totalCount
+        }
+        refs(first: 50, refPrefix: "refs/heads/") {
+          nodes {
+            name
+            target {
+              ... on Commit {
+                history {
+                  totalCount
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    starredRepositories {
+      nodes {
+        stargazerCount
+      }
+    }
+    issues {
+      totalCount
+    }
+    repositoriesContributedTo {
+      totalCount
+    }
+    pullRequests {
+      totalCount
+    }
+    pullRequests {
+      nodes {
+        reviews {
+          totalCount
+        }
+      }
+    }
+    contributionsCollection {
+      contributionCalendar {
+        totalContributions
+        weeks {
+          contributionDays {
+            contributionCount
+            date
+          }
+        }
+      }
+    }
+  }
+}`;
+
+export const getGithubGraphsTogether = async (
+  githubUsername: string,
+  githubToken: string,
+): Promise<GithubGraphsOutput> => {
+  const response = await axios.post(
+    'https://api.github.com/graphql',
+    {
+      query: GITHUB_GRAPH_DATA,
+      variables: { userName: githubUsername },
+    },
+    { headers: { Authorization: `Bearer ${githubToken}` } },
+  );
+  const languageColorMap = new Map<string, string>();
+  const languageMap = new Map<string, number>();
+  response.data.data.user.repositories.nodes.forEach((repo: any) => {
+    repo.languages.edges.forEach((edge: any) => {
+      if (languageColorMap.has(edge.node.name) === false) {
+        languageColorMap.set(edge.node.name, edge.node.color);
+      }
+      if (languageMap.has(edge.node.name)) {
+        languageMap.set(
+          edge.node.name,
+          languageMap.get(edge.node.name) + edge.size,
+        );
+      } else {
+        languageMap.set(edge.node.name, edge.size);
+      }
+    });
+  });
+  const languageArray: GithubLanguage[] = [];
+  languageMap.forEach((value, key) => {
+    languageArray.push({
+      name: key,
+      size: value,
+      color: languageColorMap.get(key),
+    });
+  });
+  languageArray.sort((a, b) => b.size - a.size);
+
+  let currentStreak = 0;
+  let longestStreak = 0;
+  let longestStreakStart = new Date();
+  let longestStreakEnd = new Date();
+  let currentStreakStart = new Date();
+  response.data.data.user.contributionsCollection.contributionCalendar.weeks.forEach(
+    (week: any) => {
+      week.contributionDays.forEach((day: any) => {
+        if (day.contributionCount > 0) {
+          if (currentStreak === 0) {
+            currentStreakStart = new Date(day.date);
+          }
+          currentStreak += 1;
+          if (currentStreak === 1) {
+            currentStreakStart = new Date(day.date);
+          }
+        } else {
+          if (currentStreak > longestStreak) {
+            longestStreak = currentStreak;
+            longestStreakStart = currentStreakStart;
+            longestStreakEnd = new Date(day.date);
+          }
+          currentStreak = 0;
+        }
+      });
+    },
+  );
+  const githubStreakGraph: GithubStreakGraph = {
+    totalContributions:
+      response.data.data.user.contributionsCollection.contributionCalendar
+        .totalContributions,
+    longestStreakLength: longestStreak,
+    longestStreakStartDate: longestStreakStart,
+    longestStreakEndDate: longestStreakEnd,
+    currentSteakLength: currentStreak,
+    currentStreakStartDate: currentStreakStart,
+  };
+  const githubStats: GithubStatistics = {
+    followers: response.data.data.user.followers.totalCount,
+    following: response.data.data.user.following.totalCount,
+    repos: response.data.data.user.repositories.totalCount,
+    stars: response.data.data.user.starredRepositories.nodes.reduce(
+      (acc, curr) => acc + curr.stargazerCount,
+      0,
+    ),
+    issues: response.data.data.user.issues.totalCount,
+    commits: response.data.data.user.repositories.nodes.reduce(
+      (acc, curr) =>
+        acc +
+        curr.refs.nodes.reduce(
+          (acc, curr) =>
+            acc +
+            (curr.name === 'master' || curr.name === 'main'
+              ? curr.target.history.totalCount
+              : 0),
+          0,
+        ),
+      0,
+    ),
+    contributedTo: response.data.data.user.repositoriesContributedTo.totalCount,
+    pullRequests: response.data.data.user.pullRequests.totalCount,
+    pullRequestReviews: response.data.data.user.pullRequests.nodes.reduce(
+      (acc, curr) => acc + curr.reviews.totalCount,
+      0,
+    ),
+    forkedBy: response.data.data.user.repositories.nodes.reduce(
+      (acc, curr) => acc + curr.forkCount,
+      0,
+    ),
+    watchedBy: response.data.data.user.repositories.nodes.reduce(
+      (acc, curr) => acc + curr.watchers.totalCount,
+      0,
+    ),
+  };
+  const githubGraphs: GithubGraphsOutput = {
+    languageGraph: languageArray,
+    statsGraph: githubStats,
+    streakGraph: githubStreakGraph,
+  };
+  return githubGraphs;
 };

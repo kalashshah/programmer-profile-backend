@@ -65,8 +65,47 @@ type CodeforcesGraphsOutput {
   donutGraph: CFDonutGraph!
 }
 
+type GithubStreakGraph {
+  currentSteakLength: Int!
+  longestStreakLength: Int!
+  longestStreakStartDate: DateTime!
+  longestStreakEndDate: DateTime!
+  currentStreakStartDate: DateTime!
+  totalContributions: Int!
+}
+
+type GithubLanguage {
+  name: String!
+  color: String!
+  size: Int!
+}
+
+type GithubStatistics {
+  # General
+  followers: Int!
+  following: Int!
+  # Repos
+  repos: Int!
+  stars: Int!
+  forkedBy: Int!
+  watchedBy: Int!
+  # Contributions
+  commits: Int!
+  issues: Int!
+  contributedTo: Int!
+  pullRequests: Int!
+  pullRequestReviews: Int!
+}
+
+type GithubGraphsOutput {
+  streakGraph: GithubStreakGraph!
+  languageGraph: [GithubLanguage!]!
+  statsGraph: GithubStatistics!
+}
+
 type Query {
   contributionGraph(input: FakeInput): ContributionGraph!
   getPinnedRepos(input: FakeInput): [Repository!]!
-  codeforcesGraphs(input: FakeInput): CodeforcesGraphsOutput!
+  codeforcesGraphs(input: FakeInput): CodeforcesGraphsOutput
+  githubGraphs(input: FakeInput): GithubGraphsOutput
 }

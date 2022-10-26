@@ -210,12 +210,49 @@ export class CodeforcesGraphsOutput {
     donutGraph: CFDonutGraph;
 }
 
+export class GithubStreakGraph {
+    currentSteakLength: number;
+    longestStreakLength: number;
+    longestStreakStartDate: DateTime;
+    longestStreakEndDate: DateTime;
+    currentStreakStartDate: DateTime;
+    totalContributions: number;
+}
+
+export class GithubLanguage {
+    name: string;
+    color: string;
+    size: number;
+}
+
+export class GithubStatistics {
+    followers: number;
+    following: number;
+    repos: number;
+    stars: number;
+    forkedBy: number;
+    watchedBy: number;
+    commits: number;
+    issues: number;
+    contributedTo: number;
+    pullRequests: number;
+    pullRequestReviews: number;
+}
+
+export class GithubGraphsOutput {
+    streakGraph: GithubStreakGraph;
+    languageGraph: GithubLanguage[];
+    statsGraph: GithubStatistics;
+}
+
 export abstract class IQuery {
     abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
 
     abstract getPinnedRepos(input?: Nullable<FakeInput>): Repository[] | Promise<Repository[]>;
 
-    abstract codeforcesGraphs(input?: Nullable<FakeInput>): CodeforcesGraphsOutput | Promise<CodeforcesGraphsOutput>;
+    abstract codeforcesGraphs(input?: Nullable<FakeInput>): Nullable<CodeforcesGraphsOutput> | Promise<Nullable<CodeforcesGraphsOutput>>;
+
+    abstract githubGraphs(input?: Nullable<FakeInput>): Nullable<GithubGraphsOutput> | Promise<Nullable<GithubGraphsOutput>>;
 
     abstract notifications(): NotificationOutput | Promise<NotificationOutput>;
 
