@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Repository } from 'src/graphql.types';
 
 const GET_CONTRIBUTION_GRAPH_QUERY = `query ($userName: String!) {
   user(login: $userName) {
@@ -140,4 +141,38 @@ export const getCodeforcesContributionGraph = async (
   } catch (error) {
     throw new Error('Incorrect Codeforces username');
   }
+};
+
+const GET_PINNED_REPOS = `
+query($userName: String!) {
+  user(login: $userName) {
+    pinnedItems(first: 6, types: [REPOSITORY]) {
+      nodes {
+        ... on Repository {
+          name
+          description
+          url
+          stargazerCount
+          forkCount
+          primaryLanguage {
+            name
+            color
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+export const pinnedRepos = async (
+  username: string,
+  githubToken: string,
+): Promise<Repository[]> => {
+  const response = await axios.post(
+    'https://api.github.com/graphql',
+    { query: GET_PINNED_REPOS, variables: { userName: username } },
+    { headers: { Authorization: `Bearer ${githubToken}` } },
+  );
+  return response.data.data.user.pinnedItems.nodes;
 };

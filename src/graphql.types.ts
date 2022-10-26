@@ -159,8 +159,16 @@ export class ContributionGraph {
     contributions: Contribution[];
 }
 
+export class Repository {
+    name: string;
+    description?: Nullable<string>;
+    url: string;
+}
+
 export abstract class IQuery {
     abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
+
+    abstract getPinnedRepos(input?: Nullable<FakeInput>): string | Promise<string>;
 
     abstract notifications(): NotificationOutput | Promise<NotificationOutput>;
 

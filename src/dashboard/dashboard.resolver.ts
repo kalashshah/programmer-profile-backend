@@ -7,8 +7,14 @@ export class DashboardResolver {
 
   @Query('contributionGraph')
   async getContributionGraph(@Context() context) {
-    const token = this.checkHeader(context.req.headers.authorization);
+    const token = this.checkHeader(context?.req?.headers?.authorization);
     return this.dashboardService.getContributionGraph(token);
+  }
+
+  @Query('getPinnedRepos')
+  async getPinnedRepos(@Context() context) {
+    const token = this.checkHeader(context?.req?.headers?.authorization);
+    return await this.dashboardService.getPinnedRepos(token);
   }
 
   checkHeader = (authorization: string) => {

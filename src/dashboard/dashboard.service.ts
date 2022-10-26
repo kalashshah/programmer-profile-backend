@@ -6,6 +6,7 @@ import {
   getGithubContributionGraph,
   getGithubUsername,
   getLeetcodeContributionGraph,
+  pinnedRepos,
 } from 'src/constants/profile.data';
 import { ContributionGraph, User } from 'src/graphql.types';
 
@@ -35,6 +36,19 @@ export class DashboardService {
       this.fillLeetcodeData(user, contributionGraph),
     ]);
     return contributionGraph;
+  }
+
+  async getPinnedRepos(token: string) {
+    const user = await decode(token, this.prisma);
+    if (user.githubToken) {
+      try {
+        const githubUsername = await getGithubUsername(user.githubToken);
+        return await pinnedRepos(githubUsername, user.githubToken);
+      } catch (err) {
+        throw new Error('Github token is invalid');
+      }
+    }
+    return [];
   }
 
   async fillCodeforcesData(user: User, contributionGraph: ContributionGraph) {
