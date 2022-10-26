@@ -28,7 +28,45 @@ type Repository {
   primaryLanguage: Language!
 }
 
+type CFRating {
+  contestId: Int!
+  contestName: String!
+  handle: String!
+  rank: Int!
+  oldRating: Int!
+  newRating: Int!
+}
+
+type CFRatingGraph {
+  ratings: [CFRating!]!
+}
+
+type CFProblemRating {
+  difficulty: Int!
+  problemsCount: Int!
+}
+
+type CFBarGraph {
+  problemRatingGraph: [CFProblemRating!]!
+}
+
+type CFProblemTag {
+  tagName: String!
+  problemsCount: Int!
+}
+
+type CFDonutGraph {
+  problemTagGraph: [CFProblemTag!]!
+}
+
+type CodeforcesGraphsOutput {
+  ratingGraph: CFRatingGraph!
+  barGraph: CFBarGraph!
+  donutGraph: CFDonutGraph!
+}
+
 type Query {
   contributionGraph(input: FakeInput): ContributionGraph!
   getPinnedRepos(input: FakeInput): [Repository!]!
+  codeforcesGraphs(input: FakeInput): CodeforcesGraphsOutput!
 }

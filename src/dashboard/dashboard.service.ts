@@ -7,8 +7,14 @@ import {
   getGithubUsername,
   getLeetcodeContributionGraph,
   pinnedRepos,
+  getCFRatingGraph,
+  getCFTagandProblemGraph,
 } from 'src/constants/profile.data';
-import { ContributionGraph, User } from 'src/graphql.types';
+import {
+  CodeforcesGraphsOutput,
+  ContributionGraph,
+  User,
+} from 'src/graphql.types';
 
 @Injectable()
 export class DashboardService {
@@ -49,6 +55,30 @@ export class DashboardService {
       }
     }
     return [];
+  }
+
+  async codeforcesGraphs(token: string): Promise<CodeforcesGraphsOutput> {
+    const user = await decode(token, this.prisma);
+    if (user.codeforcesUsername) {
+      try {
+        const [ratings, tagAndRatingGraph] = await Promise.all([
+          getCFRatingGraph(user.codeforcesUsername),
+          getCFTagandProblemGraph(user.codeforcesUsername),
+        ]);
+        return {
+          ratingGraph: { ratings: ratings || [] },
+          barGraph: { problemRatingGraph: tagAndRatingGraph.ratingArray || [] },
+          donutGraph: { problemTagGraph: tagAndRatingGraph.tagArray || [] },
+        };
+      } catch (err) {
+        throw new Error('Codeforces username is invalid');
+      }
+    }
+    return {
+      barGraph: { problemRatingGraph: [] },
+      donutGraph: { problemTagGraph: [] },
+      ratingGraph: { ratings: [] },
+    };
   }
 
   async fillCodeforcesData(user: User, contributionGraph: ContributionGraph) {

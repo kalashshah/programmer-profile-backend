@@ -159,16 +159,63 @@ export class ContributionGraph {
     contributions: Contribution[];
 }
 
+export class Language {
+    name: string;
+    color: string;
+}
+
 export class Repository {
     name: string;
     description?: Nullable<string>;
     url: string;
+    stargazerCount: number;
+    forkCount: number;
+    primaryLanguage: Language;
+}
+
+export class CFRating {
+    contestId: number;
+    contestName: string;
+    handle: string;
+    rank: number;
+    oldRating: number;
+    newRating: number;
+}
+
+export class CFRatingGraph {
+    ratings: CFRating[];
+}
+
+export class CFProblemRating {
+    difficulty: number;
+    problemsCount: number;
+}
+
+export class CFBarGraph {
+    problemRatingGraph: CFProblemRating[];
+}
+
+export class CFProblemTag {
+    tagName: string;
+    problemsCount: number;
+}
+
+export class CFDonutGraph {
+    problemTagGraph: CFProblemTag[];
+}
+
+export class CodeforcesGraphsOutput {
+    ratingGraph: CFRatingGraph;
+    barGraph: CFBarGraph;
+    donutGraph: CFDonutGraph;
 }
 
 export abstract class IQuery {
     abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
 
-    abstract getPinnedRepos(input?: Nullable<FakeInput>): string | Promise<string>;
+    abstract getPinnedRepos(input?: Nullable<FakeInput>): Repository[] | Promise<Repository[]>;
+
+    abstract codeforcesGraphs(input?: Nullable<FakeInput>): CodeforcesGraphsOutput | Promise<CodeforcesGraphsOutput>;
 
     abstract notifications(): NotificationOutput | Promise<NotificationOutput>;
 

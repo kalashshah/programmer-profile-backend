@@ -1,5 +1,10 @@
 import axios from 'axios';
-import { Repository } from 'src/graphql.types';
+import {
+  CFProblemRating,
+  CFProblemTag,
+  CFRating,
+  Repository,
+} from 'src/graphql.types';
 
 const GET_CONTRIBUTION_GRAPH_QUERY = `query ($userName: String!) {
   user(login: $userName) {
@@ -175,4 +180,63 @@ export const pinnedRepos = async (
     { headers: { Authorization: `Bearer ${githubToken}` } },
   );
   return response.data.data.user.pinnedItems.nodes;
+};
+
+export const getCFRatingGraph = async (
+  codeforcesUsername: string,
+): Promise<CFRating[]> => {
+  try {
+    const response = await axios.get(
+      `https://codeforces.com/api/user.rating?handle=${codeforcesUsername}`,
+    );
+    return response.data.result;
+  } catch (error) {
+    throw new Error('Incorrect Codeforces username');
+  }
+};
+
+export const getCFTagandProblemGraph = async (
+  codeforcesUsername: string,
+): Promise<{
+  tagArray: CFProblemTag[];
+  ratingArray: CFProblemRating[];
+}> => {
+  try {
+    const response = await axios.get(
+      `https://codeforces.com/api/user.status?handle=${codeforcesUsername}`,
+    );
+    const submissions: CodeforcesSubmission[] = response.data.result;
+    const tagMap = new Map<string, number>();
+    const ratingMap = new Map<number, number>();
+    submissions.forEach((submission) => {
+      if (submission.verdict === CodeforcesVerdict.OK) {
+        submission.problem.tags.forEach((tag) => {
+          if (tagMap.has(tag)) {
+            tagMap.set(tag, tagMap.get(tag) + 1);
+          } else {
+            tagMap.set(tag, 1);
+          }
+        });
+        if (submission.problem.rating !== undefined) {
+          if (ratingMap.has(submission.problem.rating)) {
+            ratingMap.set(
+              submission.problem.rating,
+              ratingMap.get(submission.problem.rating) + 1,
+            );
+          } else ratingMap.set(submission.problem.rating, 1);
+        }
+      }
+    });
+    const tagArray: CFProblemTag[] = [];
+    const ratingArray: CFProblemRating[] = [];
+    tagMap.forEach((value, key) =>
+      tagArray.push({ tagName: key, problemsCount: value }),
+    );
+    ratingMap.forEach((value, key) =>
+      ratingArray.push({ difficulty: key, problemsCount: value }),
+    );
+    return { tagArray, ratingArray };
+  } catch (error) {
+    throw new Error('Incorrect Codeforces username');
+  }
 };
