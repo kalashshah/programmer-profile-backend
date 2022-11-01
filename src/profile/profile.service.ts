@@ -80,40 +80,30 @@ export class ProfileService {
     return 'Username added successfully';
   }
 
-  async search(query: string, page: number): Promise<RestrictedUserOther[]> {
+  /**
+   * It searches for users based on the query, and returns the users in the page number specified
+   * @param {string} query - The query string that the user is searching for.
+   * @param {number} page - The page number of the search results.
+   * @param {string} token - The token of the user who is searching for other users.
+   * @returns An array of users that match the query.
+   */
+  async search(
+    query: string,
+    page: number,
+    token: string,
+  ): Promise<RestrictedUserOther[]> {
+    const currentUser = await decode(token, this.prisma);
     const users = await this.prisma.user.findMany({
       where: {
         isVerified: true,
         OR: [
-          {
-            codeforcesUsername: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-          {
-            leetcodeUsername: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-          {
-            name: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-          {
-            email: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
+          { codeforcesUsername: { contains: query, mode: 'insensitive' } },
+          { leetcodeUsername: { contains: query, mode: 'insensitive' } },
+          { name: { contains: query, mode: 'insensitive' } },
+          { email: { contains: query, mode: 'insensitive' } },
         ],
       },
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy: { followedByIds: 'desc' },
       skip: (page - 1) * PAGINATION_LIMIT,
       take: PAGINATION_LIMIT,
       distinct: ['id'],
@@ -127,7 +117,17 @@ export class ProfileService {
         profilePicture: true,
       },
     });
-    return users;
+    const idSet = new Set(currentUser.followingIds);
+    const result: RestrictedUserOther[] = [];
+    for (const user of users) {
+      if (user.id !== currentUser.id) {
+        result.push({
+          ...user,
+          isFollowing: idSet.has(user.id),
+        });
+      }
+    }
+    return result;
   }
 
   /**
@@ -182,6 +182,36 @@ export class ProfileService {
   }
 
   /**
+   * It takes in a user id and a token, and returns a RestrictedUserOther object
+   * @param {string} id - The id of the user you want to get
+   * @param {string} token - The token of the user who is requesting the information.
+   * @returns A RestrictedUserOther object
+   */
+  async getUserById(id: string, token: string): Promise<RestrictedUserOther> {
+    const currentUser = await decode(token, this.prisma);
+    const otherUser = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        codeforcesUsername: true,
+        description: true,
+        leetcodeUsername: true,
+        profilePicture: true,
+        githubToken: true,
+      },
+    });
+    if (!otherUser) {
+      throw new BadRequestException('User not found');
+    }
+    return {
+      ...otherUser,
+      isFollowing: currentUser.followingIds.includes(id),
+    };
+  }
+
+  /**
    * It returns the followers of a user
    * @param {number} page - The page number of the followers list.
    * @param {string} userId - The id of the user whose followers we want to get.
@@ -193,7 +223,7 @@ export class ProfileService {
     userId: string,
     token: string,
   ): Promise<RestrictedUserOther[]> {
-    await decode(token, this.prisma);
+    const currentUser = await decode(token, this.prisma);
     if (!userId) {
       throw new BadRequestException('User not found');
     }
@@ -204,13 +234,7 @@ export class ProfileService {
       throw new BadRequestException('Invalid user id');
     }
     const followers = await this.prisma.user.findMany({
-      where: {
-        following: {
-          some: {
-            id: userId,
-          },
-        },
-      },
+      where: { following: { some: { id: userId } } },
       select: {
         id: true,
         name: true,
@@ -223,7 +247,13 @@ export class ProfileService {
       skip: (page - 1) * PAGINATION_LIMIT,
       take: PAGINATION_LIMIT,
     });
-    return followers;
+    const idSet = new Set(currentUser.followingIds);
+    return followers.map((follower) => {
+      return {
+        ...follower,
+        isFollowing: idSet.has(follower.id),
+      };
+    });
   }
 
   /**
@@ -250,11 +280,7 @@ export class ProfileService {
     }
     const following = await this.prisma.user.findMany({
       where: {
-        followedBy: {
-          some: {
-            id: userId,
-          },
-        },
+        followedBy: { some: { id: userId } },
       },
       select: {
         id: true,
@@ -268,7 +294,15 @@ export class ProfileService {
       skip: (page - 1) * PAGINATION_LIMIT,
       take: PAGINATION_LIMIT,
     });
-    return following;
+    const result: RestrictedUserOther[] = [];
+    const followingSet = new Set(user.followingIds);
+    for (const follow of following) {
+      result.push({
+        ...follow,
+        isFollowing: followingSet.has(follow.id),
+      });
+    }
+    return result;
   }
 
   async addDescription(description: string, token: string): Promise<string> {

@@ -29,6 +29,7 @@ type RestrictedUserOther {
   description: String
   codeforcesUsername: String
   leetcodeUsername: String
+  isFollowing: Boolean!
 }
 
 input AddUsernameInput {
@@ -79,6 +80,7 @@ type Mutation {
 
 type Query {
   getUser: RestrictedUserSelf!
+  getUserById(input: UserIdInput!): RestrictedUserOther!
   search(input: SearchInput!): [RestrictedUserOther!]!
   getFollowers(input: PaginatedUserInput!): [RestrictedUserOther!]!
   getFollowing(input: PaginatedUserInput!): [RestrictedUserOther!]!

@@ -7,6 +7,7 @@ import {
   RestrictedUserOther,
   DescriptionInput,
   PaginatedUserInput,
+  UserIdInput,
 } from 'src/graphql.types';
 import { ProfileService } from './profile.service';
 
@@ -44,6 +45,17 @@ export class ProfileResolver {
     return await this.profileService.getUser(token);
   }
 
+  @Query('getUserById')
+  async getUserById(
+    @Args('input') input: UserIdInput,
+    @Context() context,
+  ): Promise<RestrictedUserOther> {
+    const token = context?.req?.headers?.authorization?.split(' ')[1];
+    if (token === undefined)
+      throw new Error('Invalid request, token not found');
+    return await this.profileService.getUserById(input.userId, token);
+  }
+
   @Query('search')
   async search(
     @Args('input') input: SearchInput,
@@ -53,7 +65,11 @@ export class ProfileResolver {
     const token = authorization?.split(' ')[1];
     if (token === undefined)
       throw new Error('Invalid request, token not found');
-    return await this.profileService.search(input.query, input?.page || 1);
+    return await this.profileService.search(
+      input.query,
+      input?.page || 1,
+      token,
+    );
   }
 
   @Mutation('toggleFollow')

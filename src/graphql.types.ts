@@ -183,6 +183,8 @@ export abstract class IQuery {
 
     abstract getUser(): RestrictedUserSelf | Promise<RestrictedUserSelf>;
 
+    abstract getUserById(input: UserIdInput): RestrictedUserOther | Promise<RestrictedUserOther>;
+
     abstract search(input: SearchInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 
     abstract getFollowers(input: PaginatedUserInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
@@ -338,6 +340,7 @@ export class RestrictedUserOther {
     description?: Nullable<string>;
     codeforcesUsername?: Nullable<string>;
     leetcodeUsername?: Nullable<string>;
+    isFollowing: boolean;
 }
 
 export type DateTime = any;
