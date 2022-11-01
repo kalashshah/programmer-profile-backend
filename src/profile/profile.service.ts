@@ -182,20 +182,30 @@ export class ProfileService {
   }
 
   /**
-   * It returns a list of users who follow the current user.
-   * @param {number} page - The page number of the paginated list.
+   * It returns the followers of a user
+   * @param {number} page - The page number of the followers list.
+   * @param {string} userId - The id of the user whose followers we want to get.
    * @param {string} token - The token of the user who is requesting the followers.
-   * @returns An array of restricted user objects.
+   * @returns An array of RestrictedUserOther objects.
    */
   async getFollowers(
     page: number,
+    userId: string,
     token: string,
   ): Promise<RestrictedUserOther[]> {
-    const user = await decode(token, this.prisma);
-    const userId = user.id;
+    await decode(token, this.prisma);
+    if (!userId) {
+      throw new BadRequestException('User not found');
+    }
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new BadRequestException('Invalid user id');
+    }
     const followers = await this.prisma.user.findMany({
       where: {
-        followedBy: {
+        following: {
           some: {
             id: userId,
           },
@@ -217,20 +227,30 @@ export class ProfileService {
   }
 
   /**
-   * It returns a list of users who are following the current user.
-   * @param {number} page - The page number of the paginated list.
+   * It returns the list of users who are following the user with the given userId
+   * @param {number} page - The page number of the list of users you want to get.
+   * @param {string} userId - The id of the user whose followers you want to get.
    * @param {string} token - The token of the user who is requesting the data.
-   * @returns An array of restricted user objects.
+   * @returns An array of RestrictedUserOther objects
    */
   async getFollowing(
     page: number,
+    userId: string,
     token: string,
   ): Promise<RestrictedUserOther[]> {
-    const user = await decode(token, this.prisma);
-    const userId = user.id;
+    await decode(token, this.prisma);
+    if (!userId) {
+      throw new BadRequestException('User not found');
+    }
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new BadRequestException('Invalid user id');
+    }
     const following = await this.prisma.user.findMany({
       where: {
-        following: {
+        followedBy: {
           some: {
             id: userId,
           },

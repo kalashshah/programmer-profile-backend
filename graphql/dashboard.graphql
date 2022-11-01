@@ -103,9 +103,13 @@ type GithubGraphsOutput {
   statsGraph: GithubStatistics!
 }
 
+input UserIdInput {
+  userId: String!
+}
+
 type Query {
-  contributionGraph(input: FakeInput): ContributionGraph!
-  getPinnedRepos(input: FakeInput): [Repository!]!
-  codeforcesGraphs(input: FakeInput): CodeforcesGraphsOutput
-  githubGraphs(input: FakeInput): GithubGraphsOutput
+  contributionGraph(input: UserIdInput!): ContributionGraph!
+  getPinnedRepos(input: UserIdInput!): [Repository!]!
+  codeforcesGraphs(input: UserIdInput!): CodeforcesGraphsOutput
+  githubGraphs(input: UserIdInput!): GithubGraphsOutput
 }

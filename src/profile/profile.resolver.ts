@@ -5,8 +5,8 @@ import {
   ToggleFollowInput,
   RestrictedUserSelf,
   RestrictedUserOther,
-  PaginationInput,
   DescriptionInput,
+  PaginatedUserInput,
 } from 'src/graphql.types';
 import { ProfileService } from './profile.service';
 
@@ -70,26 +70,34 @@ export class ProfileResolver {
 
   @Query('getFollowers')
   async getFollowers(
-    @Args('input') input: PaginationInput,
+    @Args('input') input: PaginatedUserInput,
     @Context() context,
   ): Promise<RestrictedUserOther[]> {
     const authorization = context.req.headers.authorization;
     const token = authorization?.split(' ')[1];
     if (token === undefined)
       throw new Error('Invalid request, token not found');
-    return await this.profileService.getFollowers(input?.page || 1, token);
+    return await this.profileService.getFollowers(
+      input?.page || 1,
+      input.userId,
+      token,
+    );
   }
 
   @Query('getFollowing')
   async getFollowing(
-    @Args('input') input: PaginationInput,
+    @Args('input') input: PaginatedUserInput,
     @Context() context,
   ): Promise<RestrictedUserOther[]> {
     const authorization = context.req.headers.authorization;
     const token = authorization?.split(' ')[1];
     if (token === undefined)
       throw new Error('Invalid request, token not found');
-    return await this.profileService.getFollowing(input?.page || 1, token);
+    return await this.profileService.getFollowing(
+      input?.page || 1,
+      input.userId,
+      token,
+    );
   }
 
   @Mutation('addDescription')

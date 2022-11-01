@@ -50,6 +50,10 @@ export class CheckCodeInput {
     email: string;
 }
 
+export class UserIdInput {
+    userId: string;
+}
+
 export class SeeNotificationInput {
     notificationId: string;
 }
@@ -77,7 +81,8 @@ export class ToggleFollowInput {
     action: ToggleAction;
 }
 
-export class PaginationInput {
+export class PaginatedUserInput {
+    userId: string;
     page?: Nullable<number>;
 }
 
@@ -246,23 +251,25 @@ export class GithubGraphsOutput {
 }
 
 export abstract class IQuery {
-    abstract contributionGraph(input?: Nullable<FakeInput>): ContributionGraph | Promise<ContributionGraph>;
+    abstract contributionGraph(input: UserIdInput): ContributionGraph | Promise<ContributionGraph>;
 
-    abstract getPinnedRepos(input?: Nullable<FakeInput>): Repository[] | Promise<Repository[]>;
+    abstract getPinnedRepos(input: UserIdInput): Repository[] | Promise<Repository[]>;
 
-    abstract codeforcesGraphs(input?: Nullable<FakeInput>): Nullable<CodeforcesGraphsOutput> | Promise<Nullable<CodeforcesGraphsOutput>>;
+    abstract codeforcesGraphs(input: UserIdInput): Nullable<CodeforcesGraphsOutput> | Promise<Nullable<CodeforcesGraphsOutput>>;
 
-    abstract githubGraphs(input?: Nullable<FakeInput>): Nullable<GithubGraphsOutput> | Promise<Nullable<GithubGraphsOutput>>;
+    abstract githubGraphs(input: UserIdInput): Nullable<GithubGraphsOutput> | Promise<Nullable<GithubGraphsOutput>>;
 
     abstract notifications(): NotificationOutput | Promise<NotificationOutput>;
+
+    abstract getUserById(input: UserIdInput): RestrictedUserOther | Promise<RestrictedUserOther>;
 
     abstract getUser(): RestrictedUserSelf | Promise<RestrictedUserSelf>;
 
     abstract search(input: SearchInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 
-    abstract getFollowers(input?: Nullable<PaginationInput>): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
+    abstract getFollowers(input: PaginatedUserInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 
-    abstract getFollowing(input?: Nullable<PaginationInput>): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
+    abstract getFollowing(input: PaginatedUserInput): RestrictedUserOther[] | Promise<RestrictedUserOther[]>;
 }
 
 export class Notification {

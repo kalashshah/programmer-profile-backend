@@ -60,12 +60,17 @@ input ToggleFollowInput {
   action: ToggleAction!
 }
 
-input PaginationInput {
+input PaginatedUserInput {
+  userId: String!
   page: Int
 }
 
 input DescriptionInput {
   description: String!
+}
+
+input UserIdInput {
+  userId: String!
 }
 
 type Mutation {
@@ -77,8 +82,9 @@ type Mutation {
 }
 
 type Query {
+  getUserById(input: UserIdInput!): RestrictedUserOther!
   getUser: RestrictedUserSelf!
   search(input: SearchInput!): [RestrictedUserOther!]!
-  getFollowers(input: PaginationInput): [RestrictedUserOther!]!
-  getFollowing(input: PaginationInput): [RestrictedUserOther!]!
+  getFollowers(input: PaginatedUserInput!): [RestrictedUserOther!]!
+  getFollowing(input: PaginatedUserInput!): [RestrictedUserOther!]!
 }

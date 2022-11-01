@@ -1,5 +1,9 @@
-import { Context, Query, Resolver } from '@nestjs/graphql';
-import { CodeforcesGraphsOutput, GithubGraphsOutput } from 'src/graphql.types';
+import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import {
+  CodeforcesGraphsOutput,
+  GithubGraphsOutput,
+  UserIdInput,
+} from 'src/graphql.types';
 import { DashboardService } from './dashboard.service';
 
 @Resolver()
@@ -7,27 +11,38 @@ export class DashboardResolver {
   constructor(private readonly dashboardService: DashboardService) {}
 
   @Query('contributionGraph')
-  async getContributionGraph(@Context() context) {
+  async getContributionGraph(
+    @Args('input') input: UserIdInput,
+    @Context() context,
+  ) {
     const token = this.checkHeader(context?.req?.headers?.authorization);
-    return this.dashboardService.getContributionGraph(token);
+    return this.dashboardService.getContributionGraph(input.userId, token);
   }
 
   @Query('getPinnedRepos')
-  async getPinnedRepos(@Context() context) {
+  async getPinnedRepos(@Args('input') input: UserIdInput, @Context() context) {
     const token = this.checkHeader(context?.req?.headers?.authorization);
-    return await this.dashboardService.getPinnedRepos(token);
+    return await this.dashboardService.getPinnedRepos(input.userId, token);
   }
 
   @Query('codeforcesGraphs')
-  async codeforcesGraphs(@Context() context): Promise<CodeforcesGraphsOutput> {
+  async codeforcesGraphs(
+    @Args('input') input: UserIdInput,
+    @Context() context,
+  ): Promise<CodeforcesGraphsOutput> {
     const token = this.checkHeader(context?.req?.headers?.authorization);
-    return await this.dashboardService.codeforcesGraphs(token);
+    return await this.dashboardService.codeforcesGraphs(input.userId, token);
   }
 
   @Query('githubGraphs')
-  async githubGraphs(@Context() context): Promise<GithubGraphsOutput> {
+  async githubGraphs(
+    @Args('input') input: UserIdInput,
+    @Context() context,
+  ): Promise<GithubGraphsOutput> {
+    console.log(input);
     const token = this.checkHeader(context?.req?.headers?.authorization);
-    return await this.dashboardService.githubGraphs(token);
+    if (!input?.userId) throw new Error('Invalid request, userId not found');
+    return await this.dashboardService.githubGraphs(input.userId, token);
   }
 
   checkHeader = (authorization: string) => {

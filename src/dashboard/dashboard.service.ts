@@ -17,13 +17,25 @@ import {
   GithubGraphsOutput,
   User,
 } from 'src/graphql.types';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class DashboardService {
   constructor(private prisma: PrismaService) {}
 
-  async getContributionGraph(token: string): Promise<ContributionGraph> {
-    const user = await decode(token, this.prisma);
+  async getContributionGraph(
+    userId: string,
+    token: string,
+  ): Promise<ContributionGraph> {
+    await decode(token, this.prisma);
+    let user;
+    try {
+      user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+    } catch (error) {
+      throw new BadRequestException('Invalid userId');
+    }
     const contributionGraph: ContributionGraph = {
       totalContributions: 0,
       contributions: [],
@@ -46,8 +58,16 @@ export class DashboardService {
     return contributionGraph;
   }
 
-  async getPinnedRepos(token: string) {
-    const user = await decode(token, this.prisma);
+  async getPinnedRepos(userId: string, token: string) {
+    await decode(token, this.prisma);
+    let user;
+    try {
+      user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+    } catch (error) {
+      throw new BadRequestException('Invalid userId');
+    }
     if (user.githubToken) {
       try {
         const githubUsername = await getGithubUsername(user.githubToken);
@@ -60,9 +80,18 @@ export class DashboardService {
   }
 
   async codeforcesGraphs(
+    userId: string,
     token: string,
   ): Promise<CodeforcesGraphsOutput | null> {
-    const user = await decode(token, this.prisma);
+    await decode(token, this.prisma);
+    let user;
+    try {
+      user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+    } catch (error) {
+      throw new BadRequestException('Invalid userId');
+    }
     if (user.codeforcesUsername) {
       try {
         const [ratings, tagAndRatingGraph] = await Promise.all([
@@ -81,8 +110,19 @@ export class DashboardService {
     return null;
   }
 
-  async githubGraphs(token: string): Promise<GithubGraphsOutput | null> {
-    const user = await decode(token, this.prisma);
+  async githubGraphs(
+    userId: string,
+    token: string,
+  ): Promise<GithubGraphsOutput | null> {
+    await decode(token, this.prisma);
+    let user;
+    try {
+      user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+    } catch (error) {
+      throw new BadRequestException('Invalid userId');
+    }
     if (user.githubToken) {
       try {
         const githubUsername = await getGithubUsername(user.githubToken);
