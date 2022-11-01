@@ -69,10 +69,6 @@ input DescriptionInput {
   description: String!
 }
 
-input UserIdInput {
-  userId: String!
-}
-
 type Mutation {
   # Authorize user with Github
   authorizeGithub(input: FakeInput): AuthorizeGithubOutput!
@@ -82,7 +78,6 @@ type Mutation {
 }
 
 type Query {
-  getUserById(input: UserIdInput!): RestrictedUserOther!
   getUser: RestrictedUserSelf!
   search(input: SearchInput!): [RestrictedUserOther!]!
   getFollowers(input: PaginatedUserInput!): [RestrictedUserOther!]!

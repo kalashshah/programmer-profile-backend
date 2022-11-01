@@ -16,6 +16,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { NotificationModule } from './notification/notification.module';
 import { NotificationService } from './notification/notification.service';
+import { ContestModule } from './contest/contest.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { NotificationService } from './notification/notification.service';
     DashboardModule,
     CloudinaryModule,
     NotificationModule,
+    ContestModule,
   ],
   controllers: [AppController],
   providers: [

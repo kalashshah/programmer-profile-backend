@@ -1,0 +1,22 @@
+type ClistContest {
+  duration: Int!
+  start: DateTime!
+  end: DateTime!
+  event: String!
+  host: String!
+  href: String!
+  id: String!
+  resource: String!
+  resource_id: Int!
+}
+
+type GetContestOutput {
+  today: [ClistContest!]!
+  tomorrow: [ClistContest!]!
+  week: [ClistContest!]!
+  upcoming: [ClistContest!]!
+}
+
+type Query {
+  getContests: GetContestOutput!
+}
