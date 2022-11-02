@@ -10,6 +10,7 @@ import {
   UserIdInput,
 } from 'src/graphql.types';
 import { ProfileService } from './profile.service';
+import { getToken } from 'src/constants/decode';
 
 @Resolver()
 export class ProfileResolver {
@@ -17,10 +18,7 @@ export class ProfileResolver {
 
   @Mutation('authorizeGithub')
   async authorizeGithub(@Context() context) {
-    const authorization = context.req.headers.authorization;
-    const token = authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return this.profileService.authorizeGithub(token);
   }
 
@@ -29,19 +27,13 @@ export class ProfileResolver {
     @Args('input') input: AddUsernameInput,
     @Context() context,
   ) {
-    const authorization = context.req.headers.authorization;
-    const token = authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return this.profileService.addUsername(input, token);
   }
 
   @Query('getUser')
   async getUser(@Context() context): Promise<RestrictedUserSelf> {
-    const authorization = context.req.headers.authorization;
-    const token = authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return await this.profileService.getUser(token);
   }
 
@@ -50,9 +42,7 @@ export class ProfileResolver {
     @Args('input') input: UserIdInput,
     @Context() context,
   ): Promise<RestrictedUserOther> {
-    const token = context?.req?.headers?.authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return await this.profileService.getUserById(input.userId, token);
   }
 
@@ -61,10 +51,7 @@ export class ProfileResolver {
     @Args('input') input: SearchInput,
     @Context() context,
   ): Promise<RestrictedUserOther[]> {
-    const authorization = context.req.headers.authorization;
-    const token = authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return await this.profileService.search(
       input.query,
       input?.page || 1,
@@ -77,10 +64,7 @@ export class ProfileResolver {
     @Args('input') input: ToggleFollowInput,
     @Context() context,
   ): Promise<string> {
-    const authorization = context.req.headers.authorization;
-    const token = authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return await this.profileService.toggleFollow(input, token);
   }
 
@@ -89,10 +73,7 @@ export class ProfileResolver {
     @Args('input') input: PaginatedUserInput,
     @Context() context,
   ): Promise<RestrictedUserOther[]> {
-    const authorization = context.req.headers.authorization;
-    const token = authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return await this.profileService.getFollowers(
       input?.page || 1,
       input.userId,
@@ -105,10 +86,7 @@ export class ProfileResolver {
     @Args('input') input: PaginatedUserInput,
     @Context() context,
   ): Promise<RestrictedUserOther[]> {
-    const authorization = context.req.headers.authorization;
-    const token = authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return await this.profileService.getFollowing(
       input?.page || 1,
       input.userId,
@@ -121,9 +99,7 @@ export class ProfileResolver {
     @Args('input') input: DescriptionInput,
     @Context() context,
   ): Promise<string> {
-    const token = context?.req?.headers?.authorization?.split(' ')[1];
-    if (token === undefined)
-      throw new Error('Invalid request, token not found');
+    const token = getToken(context);
     return await this.profileService.addDescription(input.description, token);
   }
 }

@@ -16,6 +16,7 @@ import {
 } from 'src/graphql.types';
 import { NotificationService } from 'src/notification/notification.service';
 import { followingNotification } from 'src/constants/notifications';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class ProfileService {
@@ -34,7 +35,7 @@ export class ProfileService {
     const user = await decode(token, this.prisma);
     const userId = user.id;
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
     const state = this.createState(userId);
     await this.clearGithubAuthTokens(userId);
@@ -62,7 +63,10 @@ export class ProfileService {
     const userId = user.id;
     const { username, platform } = data;
     if (!username || !platform) {
-      throw new BadRequestException('Username and platform are required');
+      throw new HttpException(
+        'Username and platform are required',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (platform === Website.CODEFORCES) {
       await this.prisma.user.update({
@@ -75,7 +79,7 @@ export class ProfileService {
         data: { leetcodeUsername: username },
       });
     } else {
-      throw new BadRequestException('Invalid platform');
+      throw new HttpException('Invalid platform', HttpStatus.BAD_REQUEST);
     }
     return 'Username added successfully';
   }
@@ -142,7 +146,10 @@ export class ProfileService {
     const userId = user.id;
     const friendId = data.userId;
     if (friendId === userId) {
-      throw new BadRequestException('You cannot follow or unfollow yourself');
+      throw new HttpException(
+        'You cannot follow or unfollow yourself',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     if (data.action === 'ADD') {
       await this.addFollowing(userId, friendId);
@@ -156,7 +163,7 @@ export class ProfileService {
       await this.removeFollowing(userId, friendId);
       await this.removeFollowedBy(userId, friendId);
     } else {
-      throw new BadRequestException('Invalid action');
+      throw new HttpException('Invalid action', HttpStatus.BAD_REQUEST);
     }
     return 'Follow toggled successfully';
   }
