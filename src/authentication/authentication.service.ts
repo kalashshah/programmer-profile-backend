@@ -7,7 +7,11 @@ import {
   SigninInput,
   SignupInput,
 } from '../../src/graphql.types';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { MailService } from 'src/mail/mail.service';
@@ -53,26 +57,38 @@ export class AuthenticationService {
     });
     const hashedPassword = bcrypt.hashSync(data.password, 10);
     if (existingUser !== null && !existingUser.isVerified) {
-      const updatedUser = await this.prisma.user.update({
-        where: { email: data.email },
-        data: {
-          name: data.name,
-          password: hashedPassword,
-          isVerified: false,
-        },
-      });
-      this.sendUserConfirmationEmail(updatedUser);
+      try {
+        const updatedUser = await this.prisma.user.update({
+          where: { email: data.email },
+          data: {
+            name: data.name,
+            password: hashedPassword,
+            isVerified: false,
+          },
+        });
+        this.sendUserConfirmationEmail(updatedUser);
+      } catch {
+        throw new InternalServerErrorException(
+          'Something went wrong while creating the user',
+        );
+      }
     }
     if (existingUser === null) {
-      const newUser = await this.prisma.user.create({
-        data: {
-          name: data.name,
-          email: data.email,
-          password: hashedPassword,
-          isVerified: false,
-        },
-      });
-      this.sendUserConfirmationEmail(newUser);
+      try {
+        const newUser = await this.prisma.user.create({
+          data: {
+            name: data.name,
+            email: data.email,
+            password: hashedPassword,
+            isVerified: false,
+          },
+        });
+        this.sendUserConfirmationEmail(newUser);
+      } catch {
+        throw new InternalServerErrorException(
+          'An error occured while creating the user',
+        );
+      }
     }
     return 'Account created successfully, please check your email to verify your account';
   }
@@ -214,11 +230,13 @@ export class AuthenticationService {
    * It deletes all tokens that are older than 10 minutes
    */
   async cleanTokens() {
-    await this.prisma.token.deleteMany({
-      where: {
-        createdAt: { lte: new Date(Date.now() - 10 * 60 * 1000) },
-      },
-    });
+    try {
+      await this.prisma.token.deleteMany({
+        where: {
+          createdAt: { lte: new Date(Date.now() - 10 * 60 * 1000) },
+        },
+      });
+    } catch {}
   }
 
   /**
@@ -228,12 +246,16 @@ export class AuthenticationService {
   async sendUserConfirmationEmail(user: User) {
     await this.cleanTokens();
     const code = this.createCode();
-    await this.prisma.token.create({
-      data: {
-        email: user.email,
-        code,
-      },
-    });
+    try {
+      await this.prisma.token.create({
+        data: {
+          email: user.email,
+          code,
+        },
+      });
+    } catch {
+      throw new InternalServerErrorException('Something went wrong');
+    }
     this.mailService.sendUserConfirmation(user, code);
   }
 
@@ -243,7 +265,8 @@ export class AuthenticationService {
    */
   createCode() {
     let code = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const possible =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
     for (let i = 0; i < 6; i++)
       code += possible.charAt(Math.floor(Math.random() * possible.length));
     return code;
