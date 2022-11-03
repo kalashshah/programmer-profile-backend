@@ -10,11 +10,13 @@ import {
   getCFRatingGraph,
   getCFTagandProblemGraph,
   getGithubGraphsTogether,
+  getLeetcodeGraphs,
 } from 'src/constants/profile.data';
 import {
   CodeforcesGraphsOutput,
   ContributionGraph,
   GithubGraphsOutput,
+  LeetcodeGraphsOutput,
   User,
 } from 'src/graphql.types';
 import { BadRequestException } from '@nestjs/common';
@@ -29,7 +31,7 @@ export class DashboardService {
     token: string,
   ): Promise<ContributionGraph> {
     await decode(token, this.prisma);
-    let user;
+    let user: User;
     try {
       user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -61,7 +63,7 @@ export class DashboardService {
 
   async getPinnedRepos(userId: string, token: string) {
     await decode(token, this.prisma);
-    let user;
+    let user: User;
     try {
       user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -88,7 +90,7 @@ export class DashboardService {
     token: string,
   ): Promise<CodeforcesGraphsOutput | null> {
     await decode(token, this.prisma);
-    let user;
+    let user: User;
     try {
       user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -122,7 +124,7 @@ export class DashboardService {
     token: string,
   ): Promise<GithubGraphsOutput | null> {
     await decode(token, this.prisma);
-    let user;
+    let user: User;
     try {
       user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -137,6 +139,31 @@ export class DashboardService {
       } catch (err) {
         throw new HttpException(
           err?.message || 'Github token is invalid',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+  }
+
+  async leetcodeGraphs(
+    userId: string,
+    token: string,
+  ): Promise<LeetcodeGraphsOutput> {
+    await decode(token, this.prisma);
+    let user: User;
+    try {
+      user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+    } catch (error) {
+      throw new BadRequestException('Invalid userId');
+    }
+    if (user.leetcodeUsername) {
+      try {
+        return await getLeetcodeGraphs(user.leetcodeUsername);
+      } catch (err) {
+        throw new HttpException(
+          err?.message || 'Leetcode token is invalid',
           HttpStatus.BAD_REQUEST,
         );
       }

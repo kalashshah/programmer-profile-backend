@@ -3,6 +3,7 @@ import { getToken } from 'src/constants/decode';
 import {
   CodeforcesGraphsOutput,
   GithubGraphsOutput,
+  LeetcodeGraphsOutput,
   UserIdInput,
 } from 'src/graphql.types';
 import { DashboardService } from './dashboard.service';
@@ -43,5 +44,14 @@ export class DashboardResolver {
     console.log(input);
     const token = getToken(context);
     return await this.dashboardService.githubGraphs(input.userId, token);
+  }
+
+  @Query('leetcodeGraphs')
+  async leetcodeGraphs(
+    @Args('input') input: UserIdInput,
+    @Context() context,
+  ): Promise<LeetcodeGraphsOutput> {
+    const token = getToken(context);
+    return await this.dashboardService.leetcodeGraphs(input.userId, token);
   }
 }

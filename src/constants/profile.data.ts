@@ -7,6 +7,7 @@ import {
   GithubLanguage,
   GithubStatistics,
   GithubStreakGraph,
+  LeetcodeGraphsOutput,
   Repository,
 } from 'src/graphql.types';
 
@@ -441,4 +442,66 @@ export const getGithubGraphsTogether = async (
     streakGraph: githubStreakGraph,
   };
   return githubGraphs;
+};
+
+const LEETCODE_GRAPHS_QUERY = `
+query data($username: String!) {
+  problems: allQuestionsCount { 
+      difficulty 
+      count 
+  }
+  user: matchedUser(username: $username) {
+      username
+      profile { 
+          realname: realName 
+          about: aboutMe 
+          avatar: userAvatar 
+          skills: skillTags 
+          country: countryName 
+          ranking
+      }
+  }
+  contest: userContestRanking(username: $username) {
+      rating
+      ranking: globalRanking
+      badge {
+          name
+      }
+  }
+}`;
+
+export const getLeetcodeGraphs = async (
+  leetcodeUsername: string,
+): Promise<LeetcodeGraphsOutput> => {
+  const response = await axios.post(
+    'https://leetcode.com/graphql',
+    {
+      query: LEETCODE_GRAPHS_QUERY,
+      variables: { username: leetcodeUsername },
+    },
+    { headers: { 'Content-Type': 'application/json' } },
+  );
+  const { problems, user, contest } = response.data.data;
+  return {
+    problems: problems.map((problem: any) => ({
+      difficulty: problem.difficulty,
+      count: problem.count,
+    })),
+    user: {
+      username: user.username,
+      profile: {
+        realname: user.profile.realname,
+        about: user.profile.about,
+        avatar: user.profile.avatar,
+        skills: user.profile.skills,
+        country: user.profile.country,
+        ranking: user.profile.ranking,
+      },
+    },
+    contest: {
+      rating: contest.rating,
+      ranking: contest.ranking,
+      badge: contest.badge?.name,
+    },
+  };
 };

@@ -179,6 +179,8 @@ export abstract class IQuery {
 
     abstract githubGraphs(input: UserIdInput): Nullable<GithubGraphsOutput> | Promise<Nullable<GithubGraphsOutput>>;
 
+    abstract leetcodeGraphs(input: UserIdInput): Nullable<LeetcodeGraphsOutput> | Promise<Nullable<LeetcodeGraphsOutput>>;
+
     abstract notifications(): NotificationOutput | Promise<NotificationOutput>;
 
     abstract getUser(): RestrictedUserSelf | Promise<RestrictedUserSelf>;
@@ -291,6 +293,41 @@ export class GithubGraphsOutput {
     streakGraph: GithubStreakGraph;
     languageGraph: GithubLanguage[];
     statsGraph: GithubStatistics;
+}
+
+export class LcBadge {
+    name: string;
+}
+
+export class LcContest {
+    rating: number;
+    ranking?: Nullable<number>;
+    badge?: Nullable<LcBadge>;
+}
+
+export class LcDifficulty {
+    difficulty: string;
+    count: number;
+}
+
+export class LcProfile {
+    realname: string;
+    about?: Nullable<string>;
+    avatar?: Nullable<string>;
+    skills: string[];
+    country?: Nullable<string>;
+    ranking?: Nullable<number>;
+}
+
+export class LcUser {
+    username: string;
+    profile: LcProfile;
+}
+
+export class LeetcodeGraphsOutput {
+    contest: LcContest;
+    problems: LcDifficulty[];
+    user: LcUser;
 }
 
 export class UserAvatar {

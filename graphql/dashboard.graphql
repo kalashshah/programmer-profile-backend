@@ -103,6 +103,41 @@ type GithubGraphsOutput {
   statsGraph: GithubStatistics!
 }
 
+type LcBadge {
+  name: String!
+}
+
+type LcContest {
+  rating: Float!
+  ranking: Int
+  badge: LcBadge
+}
+
+type LcDifficulty {
+  difficulty: String!
+  count: Int!
+}
+
+type LcProfile {
+  realname: String!
+  about: String
+  avatar: String
+  skills: [String!]!
+  country: String
+  ranking: Int
+}
+
+type LcUser {
+  username: String!
+  profile: LcProfile!
+}
+
+type LeetcodeGraphsOutput {
+  contest: LcContest!
+  problems: [LcDifficulty!]!
+  user: LcUser!
+}
+
 input UserIdInput {
   userId: String!
 }
@@ -112,4 +147,5 @@ type Query {
   getPinnedRepos(input: UserIdInput!): [Repository!]!
   codeforcesGraphs(input: UserIdInput!): CodeforcesGraphsOutput
   githubGraphs(input: UserIdInput!): GithubGraphsOutput
+  leetcodeGraphs(input: UserIdInput!): LeetcodeGraphsOutput
 }
