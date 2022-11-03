@@ -1,7 +1,7 @@
 import { Context, Query, Resolver } from '@nestjs/graphql';
 import { GetContestOutput } from 'src/graphql.types';
 import { ContestService } from './contest.service';
-import { BadRequestException } from '@nestjs/common';
+import { getToken } from 'src/constants/decode';
 
 @Resolver()
 export class ContestResolver {
@@ -9,10 +9,7 @@ export class ContestResolver {
 
   @Query('getContests')
   async getContests(@Context() context): Promise<GetContestOutput> {
-    const token = context?.req?.headers?.authorization.split(' ')[1];
-    if (!token) {
-      throw new BadRequestException('Invalid token');
-    }
+    const token = getToken(context);
     return await this.contestService.getContests(token);
   }
 }

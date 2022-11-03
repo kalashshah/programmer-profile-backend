@@ -4,6 +4,7 @@ import { PrismaService } from 'prisma/prisma.service';
 import { decode } from 'src/constants/decode';
 import { CLIST_API_KEY } from 'src/constants/env';
 import { ClistContest, GetContestOutput } from 'src/graphql.types';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class ContestService {
@@ -35,12 +36,9 @@ export class ContestService {
       }
       return result;
     } catch (error) {
-      return {
-        today: [],
-        tomorrow: [],
-        week: [],
-        upcoming: [],
-      };
+      throw new BadRequestException(
+        'Something went wrong while fetching contests',
+      );
     }
   }
 }

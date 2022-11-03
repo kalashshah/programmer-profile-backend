@@ -28,7 +28,6 @@ export class CloudinaryService {
           },
         );
         toStream(image.buffer).pipe(upload);
-        // upload image with reduced size
       });
     } catch (error) {
       throw new BadRequestException(error.message);
