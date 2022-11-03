@@ -293,15 +293,23 @@ export class GithubGraphsOutput {
     statsGraph: GithubStatistics;
 }
 
+export class UserAvatar {
+    id: string;
+    name: string;
+    profilePicture?: Nullable<string>;
+}
+
 export class Notification {
     id: string;
     description: string;
     createdAt: DateTime;
     seenAt?: Nullable<DateTime>;
     seenStatus: boolean;
-    user?: Nullable<User>;
+    User?: Nullable<UserAvatar>;
     userId?: Nullable<string>;
     notificationType: NotificationType;
+    otherUserId?: Nullable<string>;
+    OtherUser?: Nullable<UserAvatar>;
 }
 
 export class NotificationOutput {

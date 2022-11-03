@@ -1,4 +1,5 @@
 import { Mutation, Resolver, Context, Args, Query } from '@nestjs/graphql';
+import { getToken } from 'src/constants/decode';
 import { SeeNotificationInput, SeeNotificationsInput } from 'src/graphql.types';
 import { NotificationService } from './notification.service';
 
@@ -11,10 +12,7 @@ export class NotificationResolver {
     @Args('input') input: SeeNotificationInput,
     @Context() context,
   ) {
-    const token = context?.req?.headers?.authorization.split(' ')[1];
-    if (!token) {
-      throw new Error('Invalid request, token not found');
-    }
+    const token = getToken(context);
     await this.notificationService.seeNotification(input.notificationId, token);
     return 'Notification seen';
   }
@@ -24,10 +22,7 @@ export class NotificationResolver {
     @Args('input') input: SeeNotificationsInput,
     @Context() context,
   ) {
-    const token = context?.req?.headers?.authorization.split(' ')[1];
-    if (!token) {
-      throw new Error('Invalid request, token not found');
-    }
+    const token = getToken(context);
     await this.notificationService.seeNotifications(
       input.notificationIds,
       token,
@@ -37,11 +32,9 @@ export class NotificationResolver {
 
   @Query('notifications')
   async notifications(@Context() context) {
-    const token = context?.req?.headers?.authorization.split(' ')[1];
-    if (!token) {
-      throw new Error('Invalid request, token not found');
-    }
+    const token = getToken(context);
     const notifications = await this.notificationService.notifications(token);
+    console.log(notifications);
     return notifications;
   }
 }

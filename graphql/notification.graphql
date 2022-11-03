@@ -2,15 +2,23 @@ enum NotificationType {
   FOLLOWING
 }
 
+type UserAvatar {
+  id: ID!
+  name: String!
+  profilePicture: String
+}
+
 type Notification {
   id: ID!
   description: String!
   createdAt: DateTime!
   seenAt: DateTime
   seenStatus: Boolean!
-  user: User
+  User: UserAvatar
   userId: ID
   notificationType: NotificationType!
+  otherUserId: ID
+  OtherUser: UserAvatar
 }
 
 input SeeNotificationInput {

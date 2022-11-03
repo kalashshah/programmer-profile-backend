@@ -17,6 +17,7 @@ import {
 import { NotificationService } from 'src/notification/notification.service';
 import { followingNotification } from 'src/constants/notifications';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { NotificationType } from 'src/graphql.types';
 
 @Injectable()
 export class ProfileService {
@@ -157,7 +158,8 @@ export class ProfileService {
       await this.notif.sendNotification(
         friendId,
         followingNotification(user.name),
-        'FOLLOWING',
+        NotificationType.FOLLOWING,
+        userId,
       );
     } else if (data.action === 'REMOVE') {
       await this.removeFollowing(userId, friendId);
@@ -357,16 +359,20 @@ export class ProfileService {
    * @returns The updated user object.
    */
   async addFollowing(userId: string, toFollowId: string) {
-    return await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        following: {
-          connect: {
-            id: toFollowId,
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          following: {
+            connect: {
+              id: toFollowId,
+            },
           },
         },
-      },
-    });
+      });
+    } catch {
+      throw new HttpException('Invalid user id', HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -376,16 +382,20 @@ export class ProfileService {
    * @param {string} toFollowId - The id of the user that is being followed
    */
   async addFollowedBy(userId: string, toFollowId: string) {
-    await this.prisma.user.update({
-      where: { id: toFollowId },
-      data: {
-        followedBy: {
-          connect: {
-            id: userId,
+    try {
+      await this.prisma.user.update({
+        where: { id: toFollowId },
+        data: {
+          followedBy: {
+            connect: {
+              id: userId,
+            },
           },
         },
-      },
-    });
+      });
+    } catch {
+      throw new HttpException('Invalid user id', HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -397,16 +407,20 @@ export class ProfileService {
    * @returns The user object with the updated following array.
    */
   async removeFollowing(userId: string, friendId: string) {
-    return await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        following: {
-          disconnect: {
-            id: friendId,
+    try {
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          following: {
+            disconnect: {
+              id: friendId,
+            },
           },
         },
-      },
-    });
+      });
+    } catch {
+      throw new HttpException('Invalid user id', HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
@@ -416,15 +430,19 @@ export class ProfileService {
    * @param {string} friendId - The id of the user that is being followed
    */
   async removeFollowedBy(userId: string, friendId: string) {
-    await this.prisma.user.update({
-      where: { id: friendId },
-      data: {
-        followedBy: {
-          disconnect: {
-            id: userId,
+    try {
+      await this.prisma.user.update({
+        where: { id: friendId },
+        data: {
+          followedBy: {
+            disconnect: {
+              id: userId,
+            },
           },
         },
-      },
-    });
+      });
+    } catch {
+      throw new HttpException('Invalid user id', HttpStatus.BAD_REQUEST);
+    }
   }
 }
