@@ -18,6 +18,7 @@ import {
   User,
 } from 'src/graphql.types';
 import { BadRequestException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class DashboardService {
@@ -73,7 +74,10 @@ export class DashboardService {
         const githubUsername = await getGithubUsername(user.githubToken);
         return await pinnedRepos(githubUsername, user.githubToken);
       } catch (err) {
-        throw new Error('Github token is invalid');
+        throw new HttpException(
+          'Github token is invalid',
+          HttpStatus.BAD_REQUEST,
+        );
       }
     }
     return [];
@@ -104,7 +108,10 @@ export class DashboardService {
           donutGraph: { problemTagGraph: tagAndRatingGraph.tagArray || [] },
         };
       } catch (err) {
-        throw new Error('Codeforces username is invalid');
+        throw new HttpException(
+          'Codeforces username is invalid',
+          HttpStatus.BAD_REQUEST,
+        );
       }
     }
     return null;
@@ -128,7 +135,10 @@ export class DashboardService {
         const githubUsername = await getGithubUsername(user.githubToken);
         return await getGithubGraphsTogether(githubUsername, user.githubToken);
       } catch (err) {
-        throw new Error(err?.message || 'Github token is invalid');
+        throw new HttpException(
+          err?.message || 'Github token is invalid',
+          HttpStatus.BAD_REQUEST,
+        );
       }
     }
   }
@@ -156,7 +166,12 @@ export class DashboardService {
         contributionGraph.totalCodeforcesContributions =
           totalCodeforcesContributions;
         contributionGraph.totalContributions += totalCodeforcesContributions;
-      } catch (error) {}
+      } catch (error) {
+        throw new HttpException(
+          'Codeforces username is invalid',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
   }
 
@@ -183,7 +198,12 @@ export class DashboardService {
         contributionGraph.totalLeetcodeContributions =
           totalLeetcodeContributions;
         contributionGraph.totalContributions += totalLeetcodeContributions;
-      } catch (err) {}
+      } catch (err) {
+        throw new HttpException(
+          'Leetcode username is invalid',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
   }
 
@@ -220,7 +240,12 @@ export class DashboardService {
         }
         contributionGraph.totalGithubContributions = totalGithubContributions;
         contributionGraph.totalContributions += totalGithubContributions;
-      } catch (err) {}
+      } catch (err) {
+        throw new HttpException(
+          'Github token is invalid',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
   }
 }

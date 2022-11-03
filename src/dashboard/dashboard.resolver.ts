@@ -1,4 +1,5 @@
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { getToken } from 'src/constants/decode';
 import {
   CodeforcesGraphsOutput,
   GithubGraphsOutput,
@@ -15,13 +16,13 @@ export class DashboardResolver {
     @Args('input') input: UserIdInput,
     @Context() context,
   ) {
-    const token = this.checkHeader(context?.req?.headers?.authorization);
+    const token = getToken(context);
     return this.dashboardService.getContributionGraph(input.userId, token);
   }
 
   @Query('getPinnedRepos')
   async getPinnedRepos(@Args('input') input: UserIdInput, @Context() context) {
-    const token = this.checkHeader(context?.req?.headers?.authorization);
+    const token = getToken(context);
     return await this.dashboardService.getPinnedRepos(input.userId, token);
   }
 
@@ -30,7 +31,7 @@ export class DashboardResolver {
     @Args('input') input: UserIdInput,
     @Context() context,
   ): Promise<CodeforcesGraphsOutput> {
-    const token = this.checkHeader(context?.req?.headers?.authorization);
+    const token = getToken(context);
     return await this.dashboardService.codeforcesGraphs(input.userId, token);
   }
 
@@ -40,22 +41,7 @@ export class DashboardResolver {
     @Context() context,
   ): Promise<GithubGraphsOutput> {
     console.log(input);
-    const token = this.checkHeader(context?.req?.headers?.authorization);
-    if (!input?.userId) throw new Error('Invalid request, userId not found');
+    const token = getToken(context);
     return await this.dashboardService.githubGraphs(input.userId, token);
   }
-
-  checkHeader = (authorization: string) => {
-    if (!authorization) {
-      throw new Error('Not authenticated');
-    }
-    if (!authorization.startsWith('Bearer ')) {
-      throw new Error('Invalid token');
-    }
-    const token = authorization.split(' ')[1];
-    if (!token) {
-      throw new Error('Invalid token');
-    }
-    return token;
-  };
 }
