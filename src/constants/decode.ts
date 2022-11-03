@@ -13,12 +13,16 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export const decode = async (token: string, prisma: PrismaService) => {
   const decoded = jwt.verify(token, SECRET_KEY) as jwt.JwtPayload;
   const userId = decoded?.user;
-  if (!userId) throw new Error('Invalid authorization token');
+  if (!userId)
+    throw new HttpException(
+      'Invalid authorization token',
+      HttpStatus.UNAUTHORIZED,
+    );
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user)
     throw new HttpException(
       'Invalid authorization token',
-      HttpStatus.BAD_REQUEST,
+      HttpStatus.UNAUTHORIZED,
     );
   if (!user.isVerified)
     throw new HttpException('User not verified', HttpStatus.BAD_REQUEST);
