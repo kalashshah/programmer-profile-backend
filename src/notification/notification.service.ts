@@ -122,6 +122,7 @@ export class NotificationService {
                   id: true,
                   name: true,
                   profilePicture: true,
+                  description: true,
                 },
               },
               User: {
@@ -129,6 +130,7 @@ export class NotificationService {
                   id: true,
                   name: true,
                   profilePicture: true,
+                  description: true,
                 },
               },
             },

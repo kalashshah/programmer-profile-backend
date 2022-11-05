@@ -6,6 +6,7 @@ type UserAvatar {
   id: ID!
   name: String!
   profilePicture: String
+  description: String
 }
 
 type Notification {
@@ -15,9 +16,7 @@ type Notification {
   seenAt: DateTime
   seenStatus: Boolean!
   User: UserAvatar
-  userId: ID
   notificationType: NotificationType!
-  otherUserId: ID
   OtherUser: UserAvatar
 }
 

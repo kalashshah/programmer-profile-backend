@@ -34,7 +34,6 @@ export class NotificationResolver {
   async notifications(@Context() context) {
     const token = getToken(context);
     const notifications = await this.notificationService.notifications(token);
-    console.log(notifications);
     return notifications;
   }
 }

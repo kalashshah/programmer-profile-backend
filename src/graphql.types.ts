@@ -334,6 +334,7 @@ export class UserAvatar {
     id: string;
     name: string;
     profilePicture?: Nullable<string>;
+    description?: Nullable<string>;
 }
 
 export class Notification {
@@ -343,9 +344,7 @@ export class Notification {
     seenAt?: Nullable<DateTime>;
     seenStatus: boolean;
     User?: Nullable<UserAvatar>;
-    userId?: Nullable<string>;
     notificationType: NotificationType;
-    otherUserId?: Nullable<string>;
     OtherUser?: Nullable<UserAvatar>;
 }
 
