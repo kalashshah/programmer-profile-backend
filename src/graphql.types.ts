@@ -295,14 +295,12 @@ export class GithubGraphsOutput {
     statsGraph: GithubStatistics;
 }
 
-export class LcBadge {
-    name: string;
-}
-
 export class LcContest {
     rating: number;
     ranking?: Nullable<number>;
-    badge?: Nullable<LcBadge>;
+    attendedContestsCount: number;
+    totalParticipants: number;
+    topPercentage: number;
 }
 
 export class LcDifficulty {
@@ -317,15 +315,65 @@ export class LcProfile {
     skills: string[];
     country?: Nullable<string>;
     ranking?: Nullable<number>;
+    categoryDiscussCount: number;
+    solutionCount: number;
+    reputation: number;
+    postViewCount: number;
+}
+
+export class LcLanguageProblemCount {
+    languageName: string;
+    problemsSolved: number;
+}
+
+export class LcTagProblems {
+    tagName: string;
+    tagSlug: string;
+    problemsSolved: number;
+}
+
+export class LcTagProblemCount {
+    advanced: LcTagProblems[];
+    intermediate: LcTagProblems[];
+    fundamental: LcTagProblems[];
+}
+
+export class LcProblemsSolvedBeatsStats {
+    difficulty: string;
+    percentage?: Nullable<number>;
+}
+
+export class LcSubmitStatsGlobal {
+    difficulty: string;
+    count: number;
 }
 
 export class LcUser {
     username: string;
     profile: LcProfile;
+    languageProblemCount: LcLanguageProblemCount[];
+    tagProblemCounts: LcTagProblemCount;
+    problemsSolvedBeatsStats: LcProblemsSolvedBeatsStats[];
+    submitStatsGlobal: LcSubmitStatsGlobal[];
+}
+
+export class LcHistoryContest {
+    title: string;
+    startTime: DateTime;
+}
+
+export class LcContestHistory {
+    attended: boolean;
+    problemsSolved: number;
+    totalProblems: number;
+    rating: number;
+    ranking: number;
+    contest: LcHistoryContest;
 }
 
 export class LeetcodeGraphsOutput {
-    contest: LcContest;
+    contest?: Nullable<LcContest>;
+    contestHistory?: Nullable<LcContestHistory[]>;
     problems: LcDifficulty[];
     user: LcUser;
 }

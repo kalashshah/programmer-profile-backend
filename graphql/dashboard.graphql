@@ -103,14 +103,12 @@ type GithubGraphsOutput {
   statsGraph: GithubStatistics!
 }
 
-type LcBadge {
-  name: String!
-}
-
 type LcContest {
   rating: Float!
   ranking: Int
-  badge: LcBadge
+  attendedContestsCount: Int!
+  totalParticipants: Int!
+  topPercentage: Float!
 }
 
 type LcDifficulty {
@@ -125,15 +123,65 @@ type LcProfile {
   skills: [String!]!
   country: String
   ranking: Int
+  categoryDiscussCount: Int!
+  solutionCount: Int!
+  reputation: Int!
+  postViewCount: Int!
+}
+
+type LcLanguageProblemCount {
+  languageName: String!
+  problemsSolved: Int!
+}
+
+type LcTagProblems {
+  tagName: String!
+  tagSlug: String!
+  problemsSolved: Int!
+}
+
+type LcTagProblemCount {
+  advanced: [LcTagProblems!]!
+  intermediate: [LcTagProblems!]!
+  fundamental: [LcTagProblems!]!
+}
+
+type LcProblemsSolvedBeatsStats {
+  difficulty: String!
+  percentage: Float
+}
+
+type LcSubmitStatsGlobal {
+  difficulty: String!
+  count: Int!
 }
 
 type LcUser {
   username: String!
   profile: LcProfile!
+  languageProblemCount: [LcLanguageProblemCount!]!
+  tagProblemCounts: LcTagProblemCount!
+  problemsSolvedBeatsStats: [LcProblemsSolvedBeatsStats!]!
+  submitStatsGlobal: [LcSubmitStatsGlobal!]!
+}
+
+type LcHistoryContest {
+  title: String!
+  startTime: DateTime!
+}
+
+type LcContestHistory {
+  attended: Boolean!
+  problemsSolved: Int!
+  totalProblems: Int!
+  rating: Float!
+  ranking: Int!
+  contest: LcHistoryContest!
 }
 
 type LeetcodeGraphsOutput {
-  contest: LcContest!
+  contest: LcContest
+  contestHistory: [LcContestHistory!]
   problems: [LcDifficulty!]!
   user: LcUser!
 }

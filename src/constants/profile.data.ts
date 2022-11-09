@@ -63,7 +63,8 @@ export const getGithubContributionGraph = async (
   }
 };
 
-const LEETCODE_CONTRIBUTION_GRAPH_QUERY = `query getUserProfile($username: String!) {
+const LEETCODE_CONTRIBUTION_GRAPH_QUERY = `
+query getUserProfile($username: String!) {
   matchedUser(username: $username) {
     username
     submissionCalendar    
@@ -447,28 +448,75 @@ export const getGithubGraphsTogether = async (
 const LEETCODE_GRAPHS_QUERY = `
 query data($username: String!) {
   problems: allQuestionsCount { 
-      difficulty 
-      count 
+    difficulty 
+    count 
   }
   user: matchedUser(username: $username) {
-      username
-      profile { 
-          realname: realName 
-          about: aboutMe 
-          avatar: userAvatar 
-          skills: skillTags 
-          country: countryName 
-          ranking
+    username
+    profile { 
+      realname: realName 
+      about: aboutMe 
+      avatar: userAvatar 
+      skills: skillTags 
+      country: countryName 
+      ranking
+      categoryDiscussCount
+      solutionCount
+      reputation
+      postViewCount
+    }
+    languageProblemCount {
+      languageName
+      problemsSolved
+    }
+    tagProblemCounts {
+      advanced {
+        tagName
+        tagSlug
+        problemsSolved
       }
+      intermediate {
+        tagName
+        tagSlug
+        problemsSolved
+      }
+      fundamental {
+        tagName
+        tagSlug
+        problemsSolved
+      }
+    }
+    problemsSolvedBeatsStats {
+      difficulty
+      percentage
+    }
+    submitStatsGlobal {
+      acSubmissionNum {
+        difficulty
+        count
+      }
+    }
   }
   contest: userContestRanking(username: $username) {
-      rating
-      ranking: globalRanking
-      badge {
-          name
-      }
+    rating
+    ranking: globalRanking
+    attendedContestsCount
+    totalParticipants
+    topPercentage
   }
-}`;
+  contestHistory: userContestRankingHistory(username: $username) {
+    attended
+    problemsSolved
+    totalProblems
+    rating
+    ranking
+    contest {
+      title
+      startTime
+    }
+  }
+}
+`;
 
 export const getLeetcodeGraphs = async (
   leetcodeUsername: string,
@@ -481,7 +529,8 @@ export const getLeetcodeGraphs = async (
     },
     { headers: { 'Content-Type': 'application/json' } },
   );
-  const { problems, user, contest } = response.data.data;
+  const { problems, user, contest, contestHistory } = response.data.data;
+  console.log(contest);
   return {
     problems: problems.map((problem: any) => ({
       difficulty: problem.difficulty,
@@ -496,12 +545,67 @@ export const getLeetcodeGraphs = async (
         skills: user.profile.skills,
         country: user.profile.country,
         ranking: user.profile.ranking,
+        categoryDiscussCount: user.profile.categoryDiscussCount,
+        solutionCount: user.profile.solutionCount,
+        reputation: user.profile.reputation,
+        postViewCount: user.profile.postViewCount,
       },
+      languageProblemCount: user.languageProblemCount.map((language: any) => ({
+        languageName: language.languageName,
+        problemsSolved: language.problemsSolved,
+      })),
+      tagProblemCounts: {
+        advanced: user.tagProblemCounts.advanced.map((tag: any) => ({
+          tagName: tag.tagName,
+          tagSlug: tag.tagSlug,
+          problemsSolved: tag.problemsSolved,
+        })),
+        intermediate: user.tagProblemCounts.intermediate.map((tag: any) => ({
+          tagName: tag.tagName,
+          tagSlug: tag.tagSlug,
+          problemsSolved: tag.problemsSolved,
+        })),
+        fundamental: user.tagProblemCounts.fundamental.map((tag: any) => ({
+          tagName: tag.tagName,
+          tagSlug: tag.tagSlug,
+          problemsSolved: tag.problemsSolved,
+        })),
+      },
+      problemsSolvedBeatsStats: user.problemsSolvedBeatsStats.map(
+        (problem: any) => ({
+          difficulty: problem.difficulty,
+          percentage: problem.percentage,
+        }),
+      ),
+      submitStatsGlobal: user.submitStatsGlobal.acSubmissionNum.map(
+        (problem: any) => ({
+          difficulty: problem.difficulty,
+          count: problem.count,
+        }),
+      ),
     },
-    contest: {
-      rating: contest.rating,
-      ranking: contest.ranking,
-      badge: contest.badge?.name,
-    },
+    contest,
+    contestHistory:
+      contestHistory === null
+        ? null
+        : contestHistory
+            .map((contest: any) => ({
+              attended: contest.attended,
+              problemsSolved: contest.problemsSolved,
+              totalProblems: contest.totalProblems,
+              rating: contest.rating,
+              ranking: contest.ranking,
+              contest: {
+                title: contest.contest.title,
+                startTime: () => {
+                  const date = new Date(
+                    parseInt(contest.contest.startTime, 10) * 1000,
+                  );
+                  return date;
+                },
+              },
+            }))
+            .filter((contest: any) => contest.attended)
+            .sort((a, b) => a.contest.startTime - b.contest.startTime),
   };
 };
