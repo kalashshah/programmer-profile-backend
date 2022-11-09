@@ -35,6 +35,7 @@ type CFRating {
   rank: Int!
   oldRating: Int!
   newRating: Int!
+  date: DateTime!
 }
 
 type CFRatingGraph {

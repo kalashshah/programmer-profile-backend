@@ -230,6 +230,7 @@ export class CFRating {
     rank: number;
     oldRating: number;
     newRating: number;
+    date: DateTime;
 }
 
 export class CFRatingGraph {

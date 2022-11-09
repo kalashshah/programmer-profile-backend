@@ -195,6 +195,11 @@ export const getCFRatingGraph = async (
     const response = await axios.get(
       `https://codeforces.com/api/user.rating?handle=${codeforcesUsername}`,
     );
+    if (response.data?.result) {
+      for (const rating of response.data.result) {
+        rating.date = new Date(rating.ratingUpdateTimeSeconds * 1000);
+      }
+    }
     return response.data.result;
   } catch (error) {
     throw new Error('Incorrect Codeforces username');
