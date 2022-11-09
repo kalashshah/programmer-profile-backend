@@ -54,7 +54,6 @@ export class AppController {
     @Headers('authorization') authorization: string,
     @Res() res: Response,
   ) {
-    console.log('called');
     const token = authorization?.split(' ')[1];
     if (!token) {
       res.status(401).send('Invalid request, token not found');

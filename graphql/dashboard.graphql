@@ -87,7 +87,6 @@ type GithubStatistics {
   following: Int!
   # Repos
   repos: Int!
-  stars: Int!
   forkedBy: Int!
   watchedBy: Int!
   # Contributions

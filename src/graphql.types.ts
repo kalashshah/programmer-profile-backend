@@ -280,7 +280,6 @@ export class GithubStatistics {
     followers: number;
     following: number;
     repos: number;
-    stars: number;
     forkedBy: number;
     watchedBy: number;
     commits: number;

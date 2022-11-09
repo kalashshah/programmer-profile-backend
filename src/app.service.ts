@@ -38,7 +38,6 @@ export class AppService {
       userId: string;
       iat: number;
     };
-    console.log('userId', userId);
     if (!userId) {
       throw new BadRequestException('Invalid state');
     }
@@ -67,12 +66,6 @@ export class AppService {
         `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`,
         { headers: { Accept: 'application/vnd.github+json' } },
       );
-      console.log(
-        `https://github.com/login/oauth/access_token?client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}&code=${code}`,
-      );
-      console.log('data', response.data);
-      console.log('access_token', response.data.access_token);
-      console.log('type', typeof response.data);
       let access_token = '';
       let i = 0;
       while (true) if (response.data[i++] === '=') break;
@@ -80,11 +73,9 @@ export class AppService {
         if (response.data[i] === '&') break;
         access_token += response.data[i];
       }
-      console.log(response.data);
       await this.prisma.githubAuth.deleteMany({
         where: { id: userId },
       });
-      console.log('access_token', access_token);
       await this.prisma.user.update({
         where: { id: userId },
         data: {
@@ -101,7 +92,6 @@ export class AppService {
     file: Express.Multer.File,
     token: string,
   ): Promise<string> {
-    console.log(file);
     try {
       const user = await decode(token, this.prisma);
       const upload = await this.cloudinary.uploadImage(file);

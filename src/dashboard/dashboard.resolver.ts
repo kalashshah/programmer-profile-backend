@@ -41,7 +41,6 @@ export class DashboardResolver {
     @Args('input') input: UserIdInput,
     @Context() context,
   ): Promise<GithubGraphsOutput> {
-    console.log(input);
     const token = getToken(context);
     return await this.dashboardService.githubGraphs(input.userId, token);
   }

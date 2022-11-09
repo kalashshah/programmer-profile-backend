@@ -409,10 +409,6 @@ export const getGithubGraphsTogether = async (
     followers: response.data.data.user.followers.totalCount,
     following: response.data.data.user.following.totalCount,
     repos: response.data.data.user.repositories.totalCount,
-    stars: response.data.data.user.starredRepositories.nodes.reduce(
-      (acc, curr) => acc + curr.stargazerCount,
-      0,
-    ),
     issues: response.data.data.user.issues.totalCount,
     commits: response.data.data.user.repositories.nodes.reduce(
       (acc, curr) =>
@@ -535,7 +531,6 @@ export const getLeetcodeGraphs = async (
     { headers: { 'Content-Type': 'application/json' } },
   );
   const { problems, user, contest, contestHistory } = response.data.data;
-  console.log(contest);
   return {
     problems: problems.map((problem: any) => ({
       difficulty: problem.difficulty,
