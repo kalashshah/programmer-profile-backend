@@ -37,6 +37,7 @@ $ yarn
 ```bash
 # development
 $ yarn run dev
+```
 
 ## Support
 
