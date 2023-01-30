@@ -27,6 +27,11 @@ const GET_CONTRIBUTION_GRAPH_QUERY = `query ($userName: String!) {
   }
 }`;
 
+/**
+ * It takes a Github token as an argument and returns the Github username associated with that token
+ * @param {string} githubToken - The token that we got from the Github OAuth flow.
+ * @returns The username of the user who is logged in.
+ */
 export const getGithubUsername = async (githubToken: string) => {
   try {
     const response = await axios.get(`https://api.github.com/user`, {
@@ -43,6 +48,13 @@ interface GithubCalendarData {
   weeks: [{ contributionDays: [{ contributionCount: number; date: Date }] }];
 }
 
+/**
+ * It takes a Github username and a Github token as arguments, and returns a promise that resolves to
+ * the Github contribution graph data
+ * @param {string} githubUsername - The username of the Github user whose contribution graph you want to fetch.
+ * @param {string} githubToken - This is the token was generated from the users Github account.
+ * @returns GithubCalendarData
+ */
 export const getGithubContributionGraph = async (
   githubUsername: string,
   githubToken: string,
@@ -71,6 +83,12 @@ query getUserProfile($username: String!) {
   }
 }`;
 
+/**
+ * It makes a POST request to the Leetcode GraphQL API with the username as a variable, and returns the submission calendar data
+ * @param {string} leetcodeUsername - The username of the user whose contribution graph you want to
+ * fetch.
+ * @returns An array of objects containing the date and the number of submissions on that date.
+ */
 export const getLeetcodeContributionGraph = async (
   leetcodeUsername: string,
 ) => {
@@ -139,6 +157,11 @@ interface CodeforcesSubmission {
   timeConsumedMillis: number;
   memoryConsumedBytes: number;
 }
+/**
+ * It takes a Codeforces username as an argument and returns an array of submissions made by that user
+ * @param {string} codeforcesUsername - The username of the user whose submissions you want to fetch.
+ * @returns An array of CodeforcesSubmission objects
+ */
 
 export const getCodeforcesContributionGraph = async (
   codeforcesUsername: string,
@@ -176,6 +199,13 @@ query($userName: String!) {
 }
 `;
 
+/**
+ * It takes a GitHub username and a GitHub token, and returns a list of pinned repositories for that
+ * user
+ * @param {string} username - The username of the user whose pinned repos you want to fetch.
+ * @param {string} githubToken - This is the token that you get from the GitHub API.
+ * @returns An array of Repository objects
+ */
 export const pinnedRepos = async (
   username: string,
   githubToken: string,
@@ -188,6 +218,11 @@ export const pinnedRepos = async (
   return response.data.data.user.pinnedItems.nodes;
 };
 
+/**
+ * It takes a Codeforces username as a parameter and returns an array of CFRating objects
+ * @param {string} codeforcesUsername - The username of the user whose rating graph you want to fetch.
+ * @returns CFRating[]
+ */
 export const getCFRatingGraph = async (
   codeforcesUsername: string,
 ): Promise<CFRating[]> => {
@@ -205,6 +240,12 @@ export const getCFRatingGraph = async (
     throw new Error('Incorrect Codeforces username');
   }
 };
+/**
+ * It takes a Codeforces username as input and returns an object containing an array of tags and an
+ * array of ratings
+ * @param {string} codeforcesUsername - The username of the user whose submissions you want to fetch.
+ * @returns An object with two arrays, one for tags and one for ratings
+ */
 
 export const getCFTagandProblemGraph = async (
   codeforcesUsername: string,
@@ -329,6 +370,13 @@ query userInfo($userName: String!) {
   }
 }`;
 
+/**
+ * It takes a GitHub username and a GitHub token, and returns an object containing the user's language
+ * graph, statistics graph, and streak graph
+ * @param {string} githubUsername - The username of the user you want to get the data for.
+ * @param {string} githubToken - This is the token that you get from the github developer settings.
+ * @returns GithubGraphsOutput
+ */
 export const getGithubGraphsTogether = async (
   githubUsername: string,
   githubToken: string,
@@ -519,6 +567,11 @@ query data($username: String!) {
 }
 `;
 
+/**
+ * It makes a POST request to the Leetcode GraphQL API, and returns the data in a more readable format
+ * @param {string} leetcodeUsername - The username of the user you want to get the graphs for.
+ * @returns LeetcodeGraphsOutput
+ */
 export const getLeetcodeGraphs = async (
   leetcodeUsername: string,
 ): Promise<LeetcodeGraphsOutput> => {

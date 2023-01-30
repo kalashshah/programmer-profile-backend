@@ -10,10 +10,10 @@ import {
   GITHUB_SECRET_KEY,
 } from './constants/env';
 import { PrismaService } from 'prisma/prisma.service';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { GithubCallbackQuery } from './constants/profile.types';
 import * as jwt from 'jsonwebtoken';
 import { decode } from './constants/decode';
-import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Injectable()
 export class AppService {
@@ -22,13 +22,12 @@ export class AppService {
     private cloudinary: CloudinaryService,
   ) {}
 
-  getHello(): string {
-    return 'Hello from B-704';
-  }
-  getHello2(): string {
-    return '8 CPI Boi - Akhilesh Manda';
-  }
-
+  /**
+   * It takes a query object as input, verifies the state and code, and then uses the code to get an
+   * access token from Github
+   * @param {GithubCallbackQuery} query - GithubCallbackQuery
+   * @returns A string
+   */
   async githubCallback(query: GithubCallbackQuery): Promise<string> {
     const { code, state } = query;
     if (!code || !state) {
@@ -88,6 +87,13 @@ export class AppService {
     }
   }
 
+  /**
+   * It uploads a profile picture to Cloudinary, deletes the old profile picture from Cloudinary, and
+   * updates the user's profile picture in the database
+   * @param file - Express.Multer.File - This is the file that was uploaded by the user.
+   * @param {string} token - The token that was sent to the client when they logged in.
+   * @returns The secure_url of the uploaded image
+   */
   async uploadProfilePicture(
     file: Express.Multer.File,
     token: string,

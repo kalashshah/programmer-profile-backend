@@ -19,11 +19,6 @@ import { GithubCallbackQuery } from './constants/profile.types';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello2();
-  }
-
   @Get('/error')
   @Render('error')
   error(@Query('message') message: string) {

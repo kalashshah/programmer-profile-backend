@@ -8,6 +8,11 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
+  /**
+   * It sends an email to the user's email address with a 6-digit code
+   * @param {User} user - User - The user object that we want to send the email to.
+   * @param {string} code - The 6-digit code that will be sent to the user's email.
+   */
   async sendUserConfirmation(user: User, code: string) {
     try {
       await this.mailerService.sendMail({
@@ -27,6 +32,11 @@ export class MailService {
     }
   }
 
+  /**
+   * It sends an email to the user's email address with a 6-digit code to reset their password
+   * @param {User} user - User - The user object that we want to send the email to.
+   * @param {string} code - The 6-digit code that will be sent to the user's email.
+   */
   async sendPasswordReset(user: User, code: string) {
     try {
       await this.mailerService.sendMail({

@@ -9,6 +9,14 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class NotificationService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * It deletes all previous notifications of the same type from the same user, then creates a new
+   * notification
+   * @param {string} toUser - The user who will receive the notification
+   * @param {string} description - The description of the notification
+   * @param {NotificationType} type - NotificationType
+   * @param {string} [fromUser] - The user who sent the notification
+   */
   async sendNotification(
     toUser: string,
     description: string,
@@ -54,6 +62,14 @@ export class NotificationService {
     }
   }
 
+  /**
+   * It takes a notificationId and a token as arguments, decodes the token, and then updates the
+   * notification with the given notificationId to have a seenStatus of true and a seenAt date of the
+   * current date
+   * @param {string} notificationId - The id of the notification to be marked as seen
+   * @param {string} token - The token that was sent to the user's email address.
+   * @returns The notification that was updated.
+   */
   async seeNotification(notificationId: string, token: string) {
     await decode(token, this.prisma);
     try {
@@ -75,6 +91,14 @@ export class NotificationService {
     }
   }
 
+  /**
+   * It takes an array of notification ids and a token as arguments, decodes the token, and then
+   * updates the notifications with the given ids to have a seen status of true and a seenAt date of
+   * the current date
+   * @param {string[]} notificationIds - The ids of the notifications to be marked as seen
+   * @param {string} token - The token of the user who is trying to mark the notifications as seen.
+   * @returns The notifications that were updated
+   */
   async seeNotifications(notificationIds: string[], token: string) {
     await decode(token, this.prisma);
     try {
@@ -98,6 +122,12 @@ export class NotificationService {
     }
   }
 
+  /**
+   * It fetches all the notifications of a user and returns the unseen notifications count and the
+   * notifications themselves
+   * @param {string} token - The token of the user who is requesting the notifications
+   * @returns The notifications of the user.
+   */
   async notifications(token: string): Promise<NotificationOutput> {
     const user = await decode(token, this.prisma);
     this.deleteSeenPreviousNotifications();
@@ -154,6 +184,9 @@ export class NotificationService {
     }
   }
 
+  /**
+   * It deletes all notifications that are older than 24 hours and have been seen by the user
+   */
   async deleteSeenPreviousNotifications() {
     try {
       await this.prisma.notification.deleteMany({
