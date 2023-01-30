@@ -10,6 +10,10 @@ import { BadRequestException } from '@nestjs/common';
 export class ContestService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * It fetches all the contests from clist.by and sorts them into different categories according to their start date.
+   * @param {string} token - The token that is generated when a user logs in.
+   */
   async getContests(token: string): Promise<GetContestOutput> {
     await decode(token, this.prisma);
     try {
@@ -18,21 +22,46 @@ export class ContestService {
       );
       const contests: ClistContest[] = res.data.objects;
       const result: GetContestOutput = {
+        active: [],
         today: [],
         tomorrow: [],
         week: [],
         upcoming: [],
       };
+      contests.sort(
+        (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime(),
+      );
       for (const contest of contests) {
         contest.start = new Date(contest.start);
-        contest.end = new Date(contest.end);
-        if (contest.start.getDate() === new Date().getDate()) {
+        const today = new Date();
+        const tomorrow = new Date();
+        const week = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        week.setDate(week.getDate() + 7);
+        let isActive = false;
+        if (contest.start < today) {
+          isActive = true;
+          result.active.push(contest);
+        }
+        if (
+          contest.start.getDate() === today.getDate() &&
+          contest.start.getMonth() === today.getMonth() &&
+          contest.start.getFullYear() === today.getFullYear()
+        )
           result.today.push(contest);
-        } else if (contest.start.getDate() === new Date().getDate() + 1) {
+        else if (
+          contest.start.getDate() === tomorrow.getDate() &&
+          contest.start.getMonth() === tomorrow.getMonth() &&
+          contest.start.getFullYear() === tomorrow.getFullYear()
+        )
           result.tomorrow.push(contest);
-        } else if (contest.start.getDate() <= new Date().getDate() + 7) {
+        else if (
+          contest.start.getDate() <= week.getDate() &&
+          contest.start.getMonth() <= week.getMonth() &&
+          contest.start.getFullYear() <= week.getFullYear()
+        )
           result.week.push(contest);
-        } else result.upcoming.push(contest);
+        else if (!isActive) result.upcoming.push(contest);
       }
       return result;
     } catch (error) {

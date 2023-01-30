@@ -162,6 +162,7 @@ export class ClistContest {
 }
 
 export class GetContestOutput {
+    active: ClistContest[];
     today: ClistContest[];
     tomorrow: ClistContest[];
     week: ClistContest[];
