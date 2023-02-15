@@ -99,7 +99,12 @@ export const getLeetcodeContributionGraph = async (
         query: LEETCODE_CONTRIBUTION_GRAPH_QUERY,
         variables: { username: leetcodeUsername },
       },
-      { headers: { 'Content-Type': 'application/json' } },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Encoding': '*',
+        },
+      },
     );
     const res = response.data.data.matchedUser;
     const calendar = res.submissionCalendar;
