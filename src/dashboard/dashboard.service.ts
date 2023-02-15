@@ -199,10 +199,15 @@ export class DashboardService {
         return await getLeetcodeGraphs(user.leetcodeUsername);
       } catch (err) {
         throw new HttpException(
-          err?.message || 'Leetcode token is invalid',
+          err?.message || 'Leetcode username is invalid',
           HttpStatus.BAD_REQUEST,
         );
       }
+    } else {
+      throw new HttpException(
+        'Leetcode username not found, please add your leetcode username',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

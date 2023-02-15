@@ -581,7 +581,12 @@ export const getLeetcodeGraphs = async (
       query: LEETCODE_GRAPHS_QUERY,
       variables: { username: leetcodeUsername },
     },
-    { headers: { 'Content-Type': 'application/json' } },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Encoding': '*',
+      },
+    },
   );
   const { problems, user, contest, contestHistory } = response.data.data;
   return {
