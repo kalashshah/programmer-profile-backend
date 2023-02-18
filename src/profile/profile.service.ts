@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BadRequestException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
+import axios from 'axios';
 
 import { PrismaService } from 'prisma/prisma.service';
 import { decode } from 'src/constants/decode';
@@ -70,15 +71,44 @@ export class ProfileService {
       );
     }
     if (platform === Website.CODEFORCES) {
+      try {
+        const res = await axios.get(
+          `https://codeforces.com/api/user.info?handles=${username}`,
+        );
+        if (res.data.status !== 'OK') throw new Error();
+      } catch {
+        throw new HttpException(
+          'Invalid Codeforces username',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       await this.prisma.user.update({
         where: { id: userId },
         data: { codeforcesUsername: username },
       });
     } else if (platform === Website.LEETCODE) {
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: { leetcodeUsername: username },
-      });
+      try {
+        const res = await axios.post('https://leetcode.com/graphql', {
+          query: `
+            query getUserProfile($username: String!) {
+              matchedUser(username: $username) {
+                username
+              }
+            }`,
+          variables: { username: username },
+        });
+        if (res.data?.data?.matchedUser?.username) {
+          await this.prisma.user.update({
+            where: { id: userId },
+            data: { leetcodeUsername: username },
+          });
+        } else throw new Error();
+      } catch {
+        throw new HttpException(
+          'Invalid Leetcode username',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     } else {
       throw new HttpException('Invalid platform', HttpStatus.BAD_REQUEST);
     }
