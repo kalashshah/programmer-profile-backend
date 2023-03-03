@@ -18,8 +18,7 @@ export class MailService {
       await this.mailerService.sendMail({
         to: user.email,
         from: `"No Reply" <${EMAIL}>`,
-        subject:
-          'Welcome to your Programmer Profile! Please confirm your Email',
+        subject: 'Welcome to Graphenous! Please confirm your Email',
         template: './email_confirmation',
         context: {
           name: user.name,
