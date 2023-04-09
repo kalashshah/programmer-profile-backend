@@ -174,6 +174,12 @@ export const getCodeforcesContributionGraph = async (
   try {
     const response = await axios.get(
       `https://codeforces.com/api/user.status?handle=${codeforcesUsername}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Encoding': '*',
+        },
+      },
     );
     const submissions: CodeforcesSubmission[] = response.data.result;
     return submissions;
@@ -234,6 +240,12 @@ export const getCFRatingGraph = async (
   try {
     const response = await axios.get(
       `https://codeforces.com/api/user.rating?handle=${codeforcesUsername}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Encoding': '*',
+        },
+      },
     );
     if (response.data?.result) {
       for (const rating of response.data.result) {
@@ -261,6 +273,12 @@ export const getCFTagandProblemGraph = async (
   try {
     const response = await axios.get(
       `https://codeforces.com/api/user.status?handle=${codeforcesUsername}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Encoding': '*',
+        },
+      },
     );
     const submissions: CodeforcesSubmission[] = response.data.result;
     const tagMap = new Map<string, number>();
